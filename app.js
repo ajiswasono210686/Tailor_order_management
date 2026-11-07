@@ -16,11 +16,11 @@ const CASH_CATEGORIES = {
 
 // Store Configuration State
 let appConfig = {
-  storeName: "BRKH DENIM",
-  tagline: "RAW, AUTHENTIC, DURABLE",
-  address: "Jl. Gajayana 21 B Malang",
-  phone: "085648492858",
-  socialMedia: "@brkhdenim",
+  storeName: "STORE NAME",
+  tagline: "TAGLINE",
+  address: "ADDRESS",
+  phone: "PHONE",
+  socialMedia: "@BRAND",
   dailyCapacity: 20,
   scriptUrl: "",
   logo: "",
