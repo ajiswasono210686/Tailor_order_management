@@ -782,6 +782,807 @@ function saveCustomer(e) {
   });
 
   if (isDuplicate) {
+        const existingCust = customers.find(c => {
+          let existingClean = (c.phone || '').replace(/\D/g, '');
+          if (existingClean.startsWith('62')) existingClean = '0' + existingClean.slice(2);
+          return existingClean === cleanPhone;
+        });
+
+        const phoneInput = document.getElementById('cust-phone');
+        if (phoneInput) {
+          phoneInput.classList.add('border-rose-500', 'ring-2', 'ring-rose-300');
+          phoneInput.focus();
+          phoneInput.addEventListener('input', () => {
+            phoneInput.classList.remove('border-rose-500', 'ring-2', 'ring-rose-300');
+          }, { once: true });
+        }
+
+        showToast(`Nomor HP ${phone} sudah terdaftar atas nama "${existingCust ? existingCust.name : 'Pelanggan Lain'}"!`, "error");
+        return;
+      }M Workshop Management System
+// Cash Categories Configuration
+const CASH_CATEGORIES = {
+  in: [
+    { value: 'order', label: 'Order / Sales Payment', color: '#10b981' },
+    { value: 'other_income', label: 'Other Income', color: '#06b6d4' }
+  ],
+  out: [
+    { value: 'tools_materials', label: 'Tools & Materials', color: '#f59e0b' },
+    { value: 'operational', label: 'Operations & Utilities', color: '#6366f1' },
+    { value: 'meals', label: 'Meals & Refreshments', color: '#f97316' },
+    { value: 'salary', label: 'Salaries & Wages', color: '#a855f7' },
+    { value: 'other_expense', label: 'Other Expenses', color: '#64748b' }
+  ]
+};
+
+// Store Configuration State
+let appConfig = {
+  storeName: "BRKH DENIM",
+  tagline: "RAW, AUTHENTIC, DURABLE",
+  address: "Jl. Gajayana 21 B Malang",
+  phone: "085648492858",
+  socialMedia: "@brkhdenim",
+  dailyCapacity: 20,
+  scriptUrl: "",
+  logo: "",
+  currency: "IDR",
+  sizeUnit: "cm",
+  receiptFormat: "a5"
+};
+
+try {
+  const savedConfig = localStorage.getItem('brkh_config');
+  if (savedConfig) {
+    appConfig = { ...appConfig, ...JSON.parse(savedConfig) };
+  }
+} catch (e) {
+  console.warn("Error reading local config:", e);
+}
+
+let currentLogoBase64 = appConfig.logo || "";
+
+function getActiveScriptUrl() {
+  return (appConfig.scriptUrl || "").trim();
+}
+
+// In-memory application data
+let customers = [];
+let orders = [];
+let cashflow = [];
+let sizePants = [];
+let sizeShirts = [];
+let sizeSkirts = [];
+let sizeOthers = [];
+
+try {
+  customers = JSON.parse(localStorage.getItem('brkh_customers')) || [];
+  orders = JSON.parse(localStorage.getItem('brkh_orders')) || [];
+  cashflow = JSON.parse(localStorage.getItem('brkh_cashflow')) || [];
+  sizePants = JSON.parse(localStorage.getItem('brkh_size_pants')) || [];
+  sizeShirts = JSON.parse(localStorage.getItem('brkh_size_shirts')) || [];
+  sizeSkirts = JSON.parse(localStorage.getItem('brkh_size_skirts')) || [];
+  sizeOthers = JSON.parse(localStorage.getItem('brkh_size_others')) || [];
+} catch (e) {
+  console.warn("Error reading data from storage:", e);
+}
+
+// Date Navigation State
+let calendarCurrentDate = new Date();
+let dashChartDate = new Date();
+let dashYearDate = new Date();
+let cashCategoryMonthDate = new Date();
+let ledgerMonthDate = new Date();
+let cashAnalyticsActiveType = 'out';
+let selectedCalendarDateStr = null;
+
+// Toast Notification System
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const el = document.createElement('div');
+  const bg = type === 'success' ? 'bg-emerald-600 text-white' : type === 'error' ? 'bg-rose-600 text-white' : 'bg-slate-800 text-white';
+  const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-triangle' : 'info';
+  el.className = `${bg} px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2 pointer-events-auto transition-all transform duration-200 translate-y-2 opacity-0`;
+  el.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
+  container.appendChild(el);
+  lucide.createIcons();
+  requestAnimationFrame(() => {
+    el.classList.remove('translate-y-2', 'opacity-0');
+  });
+  setTimeout(() => {
+    el.classList.add('opacity-0', 'translate-y-2');
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
+
+// In-page Confirmation Modal
+let confirmActionCallback = null;
+function showConfirmModal(title, desc, onConfirm, confirmText = 'Continue', isDanger = false) {
+  document.getElementById('confirm-modal-title').innerText = title;
+  document.getElementById('confirm-modal-desc').innerText = desc;
+  const okBtn = document.getElementById('confirm-btn-ok');
+  const iconBg = document.getElementById('confirm-modal-icon-bg');
+  if (okBtn) {
+    okBtn.innerText = confirmText;
+    okBtn.className = isDanger ? 'bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition' : 'bg-copper hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition';
+  }
+  if (iconBg) {
+    iconBg.className = `w-10 h-10 rounded-xl ${isDanger ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-700'} flex items-center justify-center shrink-0`;
+  }
+  confirmActionCallback = onConfirm;
+  openModal('modal-confirm');
+  lucide.createIcons();
+}
+
+document.getElementById('confirm-btn-ok')?.addEventListener('click', () => {
+  closeModal('modal-confirm');
+  if (typeof confirmActionCallback === 'function') {
+    const action = confirmActionCallback;
+    confirmActionCallback = null;
+    action();
+  }
+});
+
+// Dynamic Multi-Currency Formatter
+function formatCurrency(num) {
+  const val = Number(num) || 0;
+  const curr = appConfig.currency || 'IDR';
+  if (curr === 'USD') return '$' + val.toLocaleString('en-US');
+  if (curr === 'EUR') return '€' + val.toLocaleString('de-DE');
+  if (curr === 'SGD') return 'S$' + val.toLocaleString('en-SG');
+  if (curr === 'MYR') return 'RM' + val.toLocaleString('ms-MY');
+  return 'Rp ' + val.toLocaleString('id-ID');
+}
+const formatRp = (num) => formatCurrency(num);
+
+function cleanDateStr(d) {
+  if (!d) return '';
+  if (d instanceof Date) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+  let str = String(d).trim();
+  if (str.includes('T')) {
+    const dateObj = new Date(str);
+    if (!isNaN(dateObj.getTime())) {
+      return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+    }
+    str = str.split('T')[0];
+  }
+  if (str.includes('/')) {
+    const parts = str.split('/');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+      else if (parts[2].length === 4) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+  }
+  if (str.includes('-')) {
+    const parts = str.split('-');
+    if (parts.length === 3 && parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+  }
+  return str;
+}
+
+// Status Normalization
+function normalizeStatus(s) {
+  if (!s) return 'received';
+  const lower = String(s).toLowerCase();
+  if (lower === 'diterima' || lower === 'received') return 'received';
+  if (lower === 'proses' || lower === 'in_progress' || lower === 'in progress') return 'in_progress';
+  if (lower === 'selesai' || lower === 'completed') return 'completed';
+  if (lower === 'diambil' || lower === 'picked_up' || lower === 'picked up') return 'picked_up';
+  return lower;
+}
+
+function checkIsLate(order) {
+  const s = normalizeStatus(order.status);
+  if (s === 'completed' || s === 'picked_up') return false;
+  const due = cleanDateStr(order.dateDue);
+  if (!due || due.length !== 10) return false;
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  return due < todayStr;
+}
+
+function updateSyncUI(text, isError = false) {
+  const mob = document.getElementById('sync-status-mobile');
+  const desk = document.getElementById('sync-status-desktop');
+  if (mob) {
+    mob.innerText = text;
+    mob.className = `text-[10px] px-2 py-0.5 rounded-full border ${isError ? 'bg-rose-900/60 border-rose-700 text-rose-200' : 'bg-slate-800 border-slate-700 text-slate-300'}`;
+  }
+  if (desk) {
+    desk.innerText = `Status: ${text}`;
+    desk.className = isError ? 'text-rose-400 font-medium' : 'text-slate-300';
+  }
+}
+
+async function syncDataFromCloud() {
+  const scriptUrl = getActiveScriptUrl();
+  if (!scriptUrl) { 
+    updateSyncUI("Local"); 
+    return; 
+  }
+  updateSyncUI("Syncing...");
+  try {
+    const res = await fetch(scriptUrl);
+    const data = await res.json();
+    
+    customers = data.customers || [];
+    orders = (data.orders || []).map(o => ({ 
+      ...o, 
+      status: normalizeStatus(o.status),
+      dateIn: cleanDateStr(o.dateIn), 
+      dateDue: cleanDateStr(o.dateDue) 
+    }));
+    cashflow = (data.cashflow || []).map(c => ({ ...c, date: cleanDateStr(c.date) }));
+    sizePants = data.sizePants || []; 
+    sizeShirts = data.sizeShirts || []; 
+    sizeSkirts = data.sizeSkirts || []; 
+    sizeOthers = data.sizeOthers || [];
+    
+    if (data.appConfig) {
+      const preservedUrl = appConfig.scriptUrl;
+      appConfig = { ...appConfig, ...data.appConfig, scriptUrl: preservedUrl };
+      currentLogoBase64 = appConfig.logo || "";
+    }
+    
+    saveLocalData();
+    updateSyncUI("Synced");
+    refreshAll();
+    loadConfigUI();
+    showToast("Successfully synchronized with Google Sheets!", "success");
+  } catch (err) {
+    console.error("Sync failed:", err);
+    updateSyncUI("Sync Failed", true);
+    showToast("Cloud sync failed. Please check the Apps Script URL.", "error");
+  }
+}
+
+function saveLocalData() {
+  try {
+    localStorage.setItem('brkh_customers', JSON.stringify(customers));
+    localStorage.setItem('brkh_orders', JSON.stringify(orders));
+    localStorage.setItem('brkh_cashflow', JSON.stringify(cashflow));
+    localStorage.setItem('brkh_size_pants', JSON.stringify(sizePants));
+    localStorage.setItem('brkh_size_shirts', JSON.stringify(sizeShirts));
+    localStorage.setItem('brkh_size_skirts', JSON.stringify(sizeSkirts));
+    localStorage.setItem('brkh_size_others', JSON.stringify(sizeOthers));
+    localStorage.setItem('brkh_config', JSON.stringify(appConfig));
+  } catch (e) {
+    console.warn("Storage full error:", e);
+    showToast("Local memory full. Consider removing very large logo images.", "error");
+  }
+}
+
+async function saveData() {
+  saveLocalData();
+  refreshAll();
+  const scriptUrl = getActiveScriptUrl();
+  if (scriptUrl) {
+    updateSyncUI("Saving...");
+    try {
+      await fetch(scriptUrl, {
+        method: 'POST', 
+        mode: 'no-cors', 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ 
+          action: 'saveAll', 
+          data: { customers, orders, cashflow, sizePants, sizeShirts, sizeSkirts, sizeOthers, appConfig } 
+        })
+      });
+      updateSyncUI("Saved");
+    } catch (err) {
+      console.error("Failed sending data to cloud:", err);
+      updateSyncUI("Saved Locally", true);
+    }
+  }
+}
+
+async function testConnection() {
+  const url = (document.getElementById('conf-script-url')?.value || "").trim();
+  if (!url) {
+    showToast("Please enter the Google Apps Script Web App URL first.", "error");
+    return;
+  }
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && typeof data === 'object') {
+      showToast("Connection Successful! Google Apps Script is ready.", "success");
+    } else {
+      showToast("Response received but format was unexpected.", "error");
+    }
+  } catch (e) {
+    showToast("Connection failed. Ensure Apps Script is deployed with 'Who has access: Anyone'.", "error");
+  }
+}
+
+// Tab Navigation
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.nav-d-btn').forEach(el => el.classList.remove('bg-amber-600', 'text-white'));
+  document.querySelectorAll('.nav-m-btn').forEach(el => el.classList.remove('text-amber-500', 'font-bold'));
+  
+  const page = document.getElementById('page-' + tab);
+  if (page) page.classList.remove('hidden');
+  
+  const deskBtn = document.getElementById('nav-d-' + tab);
+  if (deskBtn) deskBtn.classList.add('bg-amber-600', 'text-white');
+  
+  const mobBtn = document.getElementById('nav-m-' + tab);
+  if (mobBtn) mobBtn.classList.add('text-amber-500', 'font-bold');
+  
+  const fabP = document.getElementById('fab-pelanggan');
+  const fabT = document.getElementById('fab-transaksi');
+  const fabK = document.getElementById('fab-kasir');
+
+  if (fabP) fabP.classList.add('hidden');
+  if (fabT) fabT.classList.add('hidden');
+  if (fabK) fabK.classList.add('hidden');
+
+  if (tab === 'pelanggan' && fabP) fabP.classList.remove('hidden');
+  if (tab === 'transaksi' && fabT) fabT.classList.remove('hidden');
+  if (tab === 'kasir' && fabK) fabK.classList.remove('hidden');
+
+  refreshAll();
+}
+
+function switchSizeTab(tab) {
+  document.querySelectorAll('.size-pane').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.size-tab-btn').forEach(el => {
+    el.classList.remove('border-amber-600', 'text-amber-700'); 
+    el.classList.add('border-transparent', 'text-slate-500');
+  });
+  const pane = document.getElementById('size-pane-' + tab);
+  const btn = document.getElementById('tab-btn-' + tab);
+  if (pane) pane.classList.remove('hidden');
+  if (btn) { 
+    btn.classList.add('border-amber-600', 'text-amber-700'); 
+    btn.classList.remove('border-transparent', 'text-slate-500'); 
+  }
+}
+
+function openModal(id) { 
+  const el = document.getElementById(id); 
+  if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }
+}
+function closeModal(id) { 
+  const el = document.getElementById(id); 
+  if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+}
+
+// Status Badges
+function getStatusBadge(status) {
+  const s = normalizeStatus(status);
+  if (s === 'in_progress') {
+    return `<span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>In Progress</span>`;
+  }
+  if (s === 'completed') {
+    return `<span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Completed</span>`;
+  }
+  if (s === 'picked_up') {
+    return `<span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>Picked Up</span>`;
+  }
+  return `<span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Received</span>`;
+}
+
+// Customer Card & Full Order History
+function openCustomerCard(customerId) {
+  const cust = customers.find(c => c.id === customerId);
+  if (!cust) return;
+
+  document.getElementById('card-cust-name').innerText = cust.name;
+  document.getElementById('card-cust-phone').innerText = cust.phone || '-';
+
+  const btnWa = document.getElementById('card-btn-wa');
+  let cleanPhone = (cust.phone || '').replace(/\D/g, '');
+  if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
+  btnWa.onclick = () => window.open(`https://wa.me/${cleanPhone}`, '_blank');
+
+  const btnNewOrder = document.getElementById('card-btn-new-order');
+  btnNewOrder.onclick = () => {
+    closeModal('modal-customer-card');
+    openOrderModal(null, cust.id);
+  };
+
+  const btnEditSize = document.getElementById('card-btn-edit-size');
+  btnEditSize.onclick = () => {
+    closeModal('modal-customer-card');
+    openCustomerModal(cust.id);
+  };
+
+  const p = sizePants.find(x => x.customerId === cust.id) || {};
+  const s = sizeShirts.find(x => x.customerId === cust.id) || {};
+  const sk = sizeSkirts.find(x => x.customerId === cust.id) || {};
+  const o = sizeOthers.find(x => x.customerId === cust.id) || {};
+
+  const unit = appConfig.sizeUnit || 'cm';
+  const sizeContainer = document.getElementById('card-size-summary');
+  sizeContainer.innerHTML = '';
+
+  let hasPants = p.waist || p.length;
+  let hasShirt = s.lingkarDada || s.panjangBaju;
+  let hasSkirt = sk.lingkarPinggang || sk.panjangRok;
+  let hasOthers = o.namaBarang || o.dimensi;
+
+  if (hasPants) {
+    sizeContainer.innerHTML += `
+      <div class="bg-white p-2 rounded-lg border border-amber-200">
+        <span class="font-bold text-amber-800 block mb-0.5">👖 Trousers (${unit}):</span>
+        <span>W:${p.waist||'-'} | FR:${p.frontRise||'-'} | BR:${p.backRise||'-'} | Hip:${p.hip||'-'} | Thigh:${p.thigh||'-'} | Knee:${p.knee||'-'} | Inseam:${p.inseam||'-'} | L:${p.length||'-'}</span>
+        ${p.notes ? `<div class="text-[10px] text-slate-500 italic mt-0.5">Notes: ${p.notes}</div>` : ''}
+      </div>
+    `;
+  }
+  if (hasShirt) {
+    sizeContainer.innerHTML += `
+      <div class="bg-white p-2 rounded-lg border border-amber-200">
+        <span class="font-bold text-amber-800 block mb-0.5">👔 Shirts / Tops (${unit}):</span>
+        <span>Chest:${s.lingkarDada||'-'} | Shoulder:${s.lebarBahu||'-'} | Length:${s.panjangBaju||'-'} | Sleeve:${s.panjangLengan||'-'} | Belly:${s.lingkarPerut||'-'}</span>
+        ${s.catatan ? `<div class="text-[10px] text-slate-500 italic mt-0.5">Notes: ${s.catatan}</div>` : ''}
+      </div>
+    `;
+  }
+  if (hasSkirt) {
+    sizeContainer.innerHTML += `
+      <div class="bg-white p-2 rounded-lg border border-amber-200">
+        <span class="font-bold text-amber-800 block mb-0.5">👗 Skirts (${unit}):</span>
+        <span>Waist:${sk.lingkarPinggang||'-'} | Hip:${sk.lingkarPinggul||'-'} | Length:${sk.panjangRok||'-'} | Hem:${sk.lebarBawah||'-'}</span>
+        ${sk.catatan ? `<div class="text-[10px] text-slate-500 italic mt-0.5">Notes: ${sk.catatan}</div>` : ''}
+      </div>
+    `;
+  }
+  if (hasOthers) {
+    sizeContainer.innerHTML += `
+      <div class="bg-white p-2 rounded-lg border border-amber-200">
+        <span class="font-bold text-amber-800 block mb-0.5">✂️ Custom / Accessories:</span>
+        <span>Item: ${o.namaBarang||'-'} | Dimensions: ${o.dimensi||'-'}</span>
+        ${o.catatan ? `<div class="text-[10px] text-slate-500 italic mt-0.5">${o.catatan}</div>` : ''}
+      </div>
+    `;
+  }
+
+  if (!hasPants && !hasShirt && !hasSkirt && !hasOthers) {
+    sizeContainer.innerHTML = `<span class="text-slate-400 italic text-[11px] col-span-2">No measurement data recorded yet. Click "Edit Measurements" to add.</span>`;
+  }
+
+  const custOrders = orders.filter(ord => ord.customerId === cust.id);
+  let totalSpent = 0, totalRem = 0, activeCount = 0;
+
+  custOrders.forEach(ord => {
+    totalSpent += Number(ord.total) || 0;
+    totalRem += Number(ord.remaining) || 0;
+    const sNorm = normalizeStatus(ord.status);
+    if (sNorm === 'received' || sNorm === 'in_progress') activeCount++;
+  });
+
+  document.getElementById('card-total-order').innerText = `${custOrders.length} Orders`;
+  document.getElementById('card-active-order').innerText = `${activeCount} Active`;
+  document.getElementById('card-total-spent').innerText = formatCurrency(totalSpent);
+  document.getElementById('card-total-remaining').innerText = formatCurrency(totalRem);
+
+  const ordersContainer = document.getElementById('card-orders-container');
+  ordersContainer.innerHTML = '';
+
+  if (custOrders.length === 0) {
+    ordersContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs bg-slate-50 border rounded-xl">No past orders found for this customer.</div>`;
+  } else {
+    custOrders.slice().reverse().forEach(ord => {
+      const isLate = checkIsLate(ord);
+      const isSettled = Number(ord.remaining) <= 0;
+      const itemsDetail = (ord.items || []).map(it => `
+        <div class="text-[11px] flex justify-between py-0.5 border-b border-slate-100 last:border-none">
+          <span><b>[${(it.type||'custom').toUpperCase()}]</b> ${it.material || '-'} ${it.desc ? `<small class="text-slate-400">(${it.desc})</small>` : ''}</span>
+          <span class="font-semibold">${formatCurrency(it.price)}</span>
+        </div>
+      `).join('');
+
+      ordersContainer.innerHTML += `
+        <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-sm text-xs hover:border-slate-300 transition">
+          <div class="flex justify-between items-center pb-1.5 mb-1.5 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-800">${ord.id}</span>
+              <span class="text-[10px] text-slate-400">${cleanDateStr(ord.dateIn)} → Due: <b class="${isLate?'text-rose-600':''}">${cleanDateStr(ord.dateDue)}</b></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              ${isLate ? '<span class="bg-rose-100 text-rose-800 text-[9px] font-bold px-1.5 py-0.5 rounded animate-pulse">OVERDUE</span>' : ''}
+              ${getStatusBadge(ord.status)}
+            </div>
+          </div>
+          <div class="space-y-1 my-1 bg-slate-50/70 p-2 rounded-lg">${itemsDetail}</div>
+          <div class="flex justify-between items-center pt-1.5 text-[11px]">
+            <div>
+              <span class="text-slate-400">Total:</span> <b>${formatCurrency(ord.total)}</b> 
+              <span class="text-slate-400 ml-1.5">Paid:</span> <span class="text-emerald-600 font-semibold">${formatCurrency(ord.dp)}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">Due:</span>
+              <span class="font-bold ${isSettled ? 'text-emerald-600' : 'text-rose-600'}">${isSettled ? 'PAID' : formatCurrency(ord.remaining)}</span>
+              <button onclick="closeModal('modal-customer-card'); openOrderModal('${ord.id}')" class="text-amber-600 hover:bg-amber-50 p-1 rounded transition" title="Edit Order"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+              <button onclick="printOrderReceipt('${ord.id}')" class="text-slate-500 hover:bg-slate-100 p-1 rounded transition" title="Print Receipt"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  openModal('modal-customer-card');
+  lucide.createIcons();
+}
+
+// Load & Save Store Settings
+function loadConfigUI() {
+  document.querySelectorAll('.app-title-display').forEach(el => el.innerText = appConfig.storeName || "BRKH DENIM");
+  const cName = document.getElementById('conf-name'); if (cName) cName.value = appConfig.storeName || "";
+  const cTag = document.getElementById('conf-tagline'); if (cTag) cTag.value = appConfig.tagline || "";
+  const cAddr = document.getElementById('conf-address'); if (cAddr) cAddr.value = appConfig.address || "";
+  const cPhn = document.getElementById('conf-phone'); if (cPhn) cPhn.value = appConfig.phone || "";
+  const cSoc = document.getElementById('conf-socmed'); if (cSoc) cSoc.value = appConfig.socialMedia || "";
+  const cCap = document.getElementById('conf-capacity'); if (cCap) cCap.value = appConfig.dailyCapacity || 20;
+  const cUrl = document.getElementById('conf-script-url'); if (cUrl) cUrl.value = appConfig.scriptUrl || "";
+  
+  const cCurr = document.getElementById('conf-currency'); if (cCurr) cCurr.value = appConfig.currency || "IDR";
+  const cUnit = document.getElementById('conf-size-unit'); if (cUnit) cUnit.value = appConfig.sizeUnit || "cm";
+  const cFmt = document.getElementById('conf-receipt-format'); if (cFmt) cFmt.value = appConfig.receiptFormat || "a5";
+
+  document.querySelectorAll('.size-unit-badge').forEach(el => el.innerText = `(${appConfig.sizeUnit || 'cm'})`);
+
+  currentLogoBase64 = appConfig.logo || "";
+  updateLogoPreviews(currentLogoBase64);
+}
+
+function updateLogoPreviews(base64) {
+  const lPrev = document.getElementById('logo-preview');
+  const lPlaceholder = document.getElementById('logo-placeholder');
+  const btnRemove = document.getElementById('btn-remove-logo');
+  const headerMobile = document.getElementById('header-logo-mobile');
+  const headerDesktop = document.getElementById('header-logo-desktop');
+
+  if (base64 && base64.trim() !== "") {
+    if (lPrev) { lPrev.src = base64; lPrev.classList.remove('hidden'); }
+    if (lPlaceholder) lPlaceholder.classList.add('hidden');
+    if (btnRemove) btnRemove.classList.remove('hidden');
+
+    if (headerMobile) { headerMobile.src = base64; headerMobile.classList.remove('hidden'); }
+    if (headerDesktop) { headerDesktop.src = base64; headerDesktop.classList.remove('hidden'); }
+  } else {
+    if (lPrev) { lPrev.src = ""; lPrev.classList.add('hidden'); }
+    if (lPlaceholder) lPlaceholder.classList.remove('hidden');
+    if (btnRemove) btnRemove.classList.add('hidden');
+
+    if (headerMobile) { headerMobile.src = ""; headerMobile.classList.add('hidden'); }
+    if (headerDesktop) { headerDesktop.src = ""; headerDesktop.classList.add('hidden'); }
+  }
+}
+
+function previewLogo(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    showToast("Please choose an image file (PNG, JPG, or WEBP).", "error");
+    event.target.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      const maxDim = 300;
+
+      if (width > height) {
+        if (width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        }
+      } else {
+        if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      currentLogoBase64 = canvas.toDataURL('image/png', 0.9);
+      updateLogoPreviews(currentLogoBase64);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+  showConfirmModal("Remove Logo?", "Are you sure you want to remove the store logo?", () => {
+    currentLogoBase64 = "";
+    const fileInput = document.getElementById('conf-logo');
+    if (fileInput) fileInput.value = "";
+    updateLogoPreviews("");
+    showToast("Store logo removed.", "info");
+  }, "Remove", true);
+}
+
+function saveConfig(e) {
+  e.preventDefault();
+  const newUrl = (document.getElementById('conf-script-url')?.value || "").trim();
+
+  appConfig = {
+    storeName: document.getElementById('conf-name').value.trim() || "BRKH DENIM",
+    tagline: document.getElementById('conf-tagline').value.trim(),
+    address: document.getElementById('conf-address').value.trim(),
+    phone: document.getElementById('conf-phone').value.trim(),
+    socialMedia: document.getElementById('conf-socmed').value.trim(),
+    dailyCapacity: Number(document.getElementById('conf-capacity').value) || 20,
+    scriptUrl: newUrl,
+    logo: currentLogoBase64 || "",
+    currency: document.getElementById('conf-currency').value || "IDR",
+    sizeUnit: document.getElementById('conf-size-unit').value || "cm",
+    receiptFormat: document.getElementById('conf-receipt-format').value || "a5"
+  };
+  
+  saveData();
+  showToast("Store settings saved successfully!", "success");
+  loadConfigUI();
+
+  if (newUrl) {
+    syncDataFromCloud();
+  } else {
+    updateSyncUI("Local");
+  }
+}
+
+// JSON Database Backup & Restore
+function downloadBackupJson() {
+  const backupData = {
+    appName: "BRKH DENIM Workshop App",
+    version: "2.1",
+    language: "en",
+    exportDate: new Date().toISOString(),
+    appConfig: appConfig,
+    customers: customers,
+    orders: orders,
+    cashflow: cashflow,
+    sizePants: sizePants,
+    sizeShirts: sizeShirts,
+    sizeSkirts: sizeSkirts,
+    sizeOthers: sizeOthers
+  };
+  const jsonStr = JSON.stringify(backupData, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+  a.href = url;
+  a.download = `backup_workshop_brkh_${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("Backup JSON file downloaded successfully!", "success");
+}
+
+function triggerRestoreJson() {
+  const input = document.getElementById('input-restore-json');
+  if (input) input.click();
+}
+
+function handleRestoreFile(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.json')) {
+    showToast("Please choose a valid .json file.", "error");
+    e.target.value = "";
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const data = JSON.parse(evt.target.result);
+      if (!data || typeof data !== 'object') {
+        throw new Error("Invalid JSON backup structure.");
+      }
+      showConfirmModal(
+        "Restore Database Backup?",
+        `This backup file contains: ${(data.customers||[]).length} customers, ${(data.orders||[]).length} orders, and ${(data.cashflow||[]).length} cashbook entries. Current database records will be replaced. Proceed?`,
+        () => {
+          if (Array.isArray(data.customers)) customers = data.customers;
+          if (Array.isArray(data.orders)) orders = data.orders.map(o => ({ 
+            ...o, 
+            status: normalizeStatus(o.status),
+            dateIn: cleanDateStr(o.dateIn), 
+            dateDue: cleanDateStr(o.dateDue) 
+          }));
+          if (Array.isArray(data.cashflow)) cashflow = data.cashflow.map(c => ({ ...c, date: cleanDateStr(c.date) }));
+          if (Array.isArray(data.sizePants)) sizePants = data.sizePants;
+          if (Array.isArray(data.sizeShirts)) sizeShirts = data.sizeShirts;
+          if (Array.isArray(data.sizeSkirts)) sizeSkirts = data.sizeSkirts;
+          if (Array.isArray(data.sizeOthers)) sizeOthers = data.sizeOthers;
+          if (data.appConfig && typeof data.appConfig === 'object') {
+            const preservedUrl = appConfig.scriptUrl;
+            appConfig = { ...appConfig, ...data.appConfig, scriptUrl: preservedUrl };
+            currentLogoBase64 = appConfig.logo || "";
+          }
+          saveData();
+          loadConfigUI();
+          refreshAll();
+          showToast("Database restored successfully!", "success");
+        },
+        "Restore Now"
+      );
+    } catch (err) {
+      console.error(err);
+      showToast("Failed reading backup file: " + err.message, "error");
+    } finally {
+      e.target.value = "";
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Customer Database Logic
+function openCustomerModal(id = null) {
+  document.getElementById('form-customer').reset();
+  document.getElementById('cust-id').value = id || '';
+  document.getElementById('customer-modal-title').innerText = id ? 'Edit Customer Profile' : 'Add New Customer';
+  switchSizeTab('pants');
+  if (id) {
+    const c = customers.find(x => x.id === id);
+    if (c) {
+      document.getElementById('cust-name').value = c.name || '';
+      document.getElementById('cust-phone').value = c.phone || '';
+      const p = sizePants.find(x => x.customerId === id) || {};
+      ['waist','frontrise','backrise','hip','thigh','knee','legopening','inseam','length','notes'].forEach(k => {
+        const el = document.getElementById('p-'+k); 
+        if(el) el.value = p[k==='frontrise'?'frontRise':k==='backrise'?'backRise':k==='legopening'?'legOpening':k] || '';
+      });
+      const s = sizeShirts.find(x => x.customerId === id) || {};
+      ['lebar-bahu','lingkar-dada','panjang-baju','panjang-lengan','kerung-lengan','pergelangan','lingkar-perut','catatan'].forEach(k => {
+        const el = document.getElementById('s-'+k); 
+        if(el) el.value = s[k.replace(/-([a-z])/g, g => g[1].toUpperCase())] || '';
+      });
+      const sk = sizeSkirts.find(x => x.customerId === id) || {};
+      ['lingkar-pinggang','lingkar-pinggul','panjang-rok','lebar-bawah','catatan'].forEach(k => {
+        const el = document.getElementById('sk-'+k); 
+        if(el) el.value = sk[k.replace(/-([a-z])/g, g => g[1].toUpperCase())] || '';
+      });
+      const o = sizeOthers.find(x => x.customerId === id) || {};
+      ['nama-barang','dimensi','catatan'].forEach(k => {
+        const el = document.getElementById('o-'+k); 
+        if(el) el.value = o[k.replace(/-([a-z])/g, g => g[1].toUpperCase())] || '';
+      });
+    }
+  }
+  openModal('modal-customer');
+}
+
+function saveCustomer(e) {
+  e.preventDefault();
+  const id = document.getElementById('cust-id').value || 'C-' + Date.now().toString().slice(-4);
+  const name = document.getElementById('cust-name').value.trim();
+  const phone = document.getElementById('cust-phone').value.trim();
+
+  let cleanPhone = phone.replace(/\D/g, '');
+  if (cleanPhone.startsWith('62')) cleanPhone = '0' + cleanPhone.slice(2);
+
+  const isDuplicate = customers.some(c => {
+    let existingClean = (c.phone || '').replace(/\D/g, '');
+    if (existingClean.startsWith('62')) existingClean = '0' + existingClean.slice(2);
+    return existingClean === cleanPhone && c.id !== id;
+  });
+
+  if (isDuplicate) {
     const existingCust = customers.find(c => {
       let existingClean = (c.phone || '').replace(/\D/g, '');
       if (existingClean.startsWith('62')) existingClean = '0' + existingClean.slice(2);
