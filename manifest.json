@@ -1,7 +1,7 @@
 {
-  "name": "BRKH DENIM - Workshop App",
-  "short_name": "WorkshopApp",
-  "description": "Workshop management, custom denim orders, scheduling & bookkeeping for BRKH DENIM",
+  "name": "Tailor order management",
+  "short_name": "TOM",
+  "description": "Workshop management, custom denim orders, scheduling & bookkeeping for tailor",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
