@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Workshop App - BRKH DENIM</title>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#111a26">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Workshop App">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Tailwind & Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .bg-denim { background-color: #1a2536; }
+    .bg-denim-dark { background-color: #111a26; }
+    .text-copper { color: #d97736; }
+    .bg-copper { background-color: #d97736; }
+    .bg-copper:hover { background-color: #bf6326; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row pb-20 md:pb-0 relative">
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-2"></div>
+
+  <!-- MOBILE TOP BAR -->
+  <header class="md:hidden bg-denim-dark text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-30">
+    <div class="flex items-center gap-2.5">
+      <img id="header-logo-mobile" src="" alt="Logo" class="w-8 h-8 object-contain rounded bg-white/10 hidden">
+      <div>
+        <span class="text-lg font-black tracking-wider app-title-display">BRKH DENIM</span>
+        <span class="text-[10px] block text-slate-400 font-medium tracking-wider">WORKSHOP APP</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span id="sync-status-mobile" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">Local</span>
+      <button onclick="syncDataFromCloud()" class="p-1 hover:text-amber-400 transition" title="Sync with Cloud"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+    </div>
+  </header>
+
+  <!-- DESKTOP SIDEBAR -->
+  <aside class="hidden md:flex w-64 bg-denim-dark text-slate-200 flex-col shrink-0 shadow-xl h-screen sticky top-0">
+    <div class="p-6 border-b border-slate-800">
+      <div class="flex items-center gap-3 mb-2">
+        <img id="header-logo-desktop" src="" alt="Logo" class="w-10 h-10 object-contain rounded bg-white/10 hidden">
+        <div>
+          <h1 class="text-xl font-black tracking-wider text-white app-title-display">BRKH DENIM</h1>
+          <p class="text-[10px] text-slate-400 uppercase tracking-widest">Workshop App</p>
+        </div>
+      </div>
+      <div class="mt-3 flex items-center justify-between text-xs bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+        <span id="sync-status-desktop" class="text-slate-300">Status: Local</span>
+        <button onclick="syncDataFromCloud()" title="Re-sync" class="text-amber-400 hover:text-amber-300 transition">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+    <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto">
+      <button onclick="switchTab('dashboard')" id="nav-d-dashboard" class="nav-d-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold hover:bg-slate-800 transition">
+        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+      </button>
+      <button onclick="switchTab('pelanggan')" id="nav-d-pelanggan" class="nav-d-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold hover:bg-slate-800 transition">
+        <i data-lucide="users" class="w-5 h-5"></i> Customers
+      </button>
+      <button onclick="switchTab('transaksi')" id="nav-d-transaksi" class="nav-d-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold hover:bg-slate-800 transition">
+        <i data-lucide="shopping-bag" class="w-5 h-5"></i> Orders & Jobs
+      </button>
+      <button onclick="switchTab('jadwal')" id="nav-d-jadwal" class="nav-d-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold hover:bg-slate-800 transition">
+        <i data-lucide="calendar" class="w-5 h-5"></i> Schedule & Capacity
+      </button>
+      <button onclick="switchTab('kasir')" id="nav-d-kasir" class="nav-d-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold hover:bg-slate-800 transition">
+        <i data-lucide="wallet" class="w-5 h-5"></i> Cashbook & Ledger
+      </button>
+      <button onclick="switchTab('setting')" id="nav-d-setting" class="nav-d-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold hover:bg-slate-800 transition">
+        <i data-lucide="settings" class="w-5 h-5"></i> Settings
+      </button>
+    </nav>
+  </aside>
+
+  <!-- MOBILE BOTTOM BAR -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-denim-dark text-slate-400 flex justify-around items-center border-t border-slate-800 py-2 px-1 z-30 shadow-lg overflow-x-auto no-scrollbar">
+    <button onclick="switchTab('dashboard')" id="nav-m-dashboard" class="nav-m-btn flex flex-col items-center gap-1 text-[10px] min-w-[55px] py-1">
+      <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+    </button>
+    <button onclick="switchTab('pelanggan')" id="nav-m-pelanggan" class="nav-m-btn flex flex-col items-center gap-1 text-[10px] min-w-[55px] py-1">
+      <i data-lucide="users" class="w-5 h-5"></i> Customers
+    </button>
+    <button onclick="switchTab('transaksi')" id="nav-m-transaksi" class="nav-m-btn flex flex-col items-center gap-1 text-[10px] min-w-[55px] py-1">
+      <i data-lucide="shopping-bag" class="w-5 h-5"></i> Orders
+    </button>
+    <button onclick="switchTab('jadwal')" id="nav-m-jadwal" class="nav-m-btn flex flex-col items-center gap-1 text-[10px] min-w-[55px] py-1">
+      <i data-lucide="calendar" class="w-5 h-5"></i> Schedule
+    </button>
+    <button onclick="switchTab('kasir')" id="nav-m-kasir" class="nav-m-btn flex flex-col items-center gap-1 text-[10px] min-w-[55px] py-1">
+      <i data-lucide="wallet" class="w-5 h-5"></i> Cashbook
+    </button>
+    <button onclick="switchTab('setting')" id="nav-m-setting" class="nav-m-btn flex flex-col items-center gap-1 text-[10px] min-w-[55px] py-1">
+      <i data-lucide="settings" class="w-5 h-5"></i> Settings
+    </button>
+  </nav>
+
+  <!-- FLOATING ACTION BUTTONS -->
+  <div class="fixed right-5 bottom-20 md:bottom-8 z-40 flex flex-col gap-3">
+    <button id="fab-pelanggan" onclick="openCustomerModal()" class="hidden bg-copper hover:bg-amber-600 text-white p-3.5 rounded-full shadow-2xl flex items-center gap-2 transition transform active:scale-95 group border-2 border-white/20">
+      <i data-lucide="user-plus" class="w-5 h-5"></i>
+      <span class="text-xs font-bold pr-1 hidden sm:inline-block">Add Customer</span>
+    </button>
+
+    <button id="fab-transaksi" onclick="openOrderModal()" class="hidden bg-copper hover:bg-amber-600 text-white p-3.5 rounded-full shadow-2xl flex items-center gap-2 transition transform active:scale-95 group border-2 border-white/20">
+      <i data-lucide="plus-circle" class="w-5 h-5"></i>
+      <span class="text-xs font-bold pr-1 hidden sm:inline-block">Create Order</span>
+    </button>
+
+    <button id="fab-kasir" onclick="openCashModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white p-3.5 rounded-full shadow-2xl flex items-center gap-2 transition transform active:scale-95 group border-2 border-white/20">
+      <i data-lucide="plus-circle" class="w-5 h-5"></i>
+      <span class="text-xs font-bold pr-1 hidden sm:inline-block">Record Cash</span>
+    </button>
+  </div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-1 w-full max-w-full p-4 sm:p-6 md:p-8 overflow-x-hidden overflow-y-auto">
+
+    <!-- 1. DASHBOARD PAGE -->
+    <section id="page-dashboard" class="tab-content space-y-5">
+      <div class="hidden md:flex justify-between items-center pb-4 border-b border-slate-200">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900 tracking-tight">Main Dashboard</h2>
+          <p class="text-xs text-slate-500">Operational analytics, order queues, nearest deadlines & cashflow overview</p>
+        </div>
+        <div id="desktop-date" class="text-xs text-slate-500 font-semibold bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm"></div>
+      </div>
+
+      <!-- BLOCK 1: TOTAL REGISTERED CUSTOMERS ONLY -->
+      <div class="bg-gradient-to-br from-white to-slate-50 p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span> Customer Database
+          </span>
+          <div class="flex items-baseline gap-2.5 mt-1.5">
+            <h3 class="text-3xl sm:text-5xl font-black text-slate-900" id="stat-total-customers">0</h3>
+            <span class="text-xs sm:text-sm font-bold text-slate-500">Registered Customers</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Total customer profiles and saved body measurement charts</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="switchTab('pelanggan')" class="hidden sm:flex items-center gap-1.5 text-xs font-bold text-copper hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-3.5 py-2 rounded-xl transition border border-amber-200">
+            <i data-lucide="users" class="w-4 h-4"></i> Manage Customers
+          </button>
+          <div class="w-14 h-14 sm:w-16 sm:h-16 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100 flex items-center justify-center shadow-inner">
+            <i data-lucide="users" class="w-7 h-7 sm:w-8 sm:h-8"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCK 2: ORDER COUNTS BY STATUS & DONUT CHART (CUSTOM VS REPAIR) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        
+        <!-- Sub-block A: Order Count by Status -->
+        <div class="lg:col-span-7 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <h3 class="font-bold text-sm sm:text-base text-slate-800 flex items-center gap-2">
+                <i data-lucide="layers" class="w-4 h-4 text-copper"></i> Order Queue by Status
+              </h3>
+              <p class="text-[11px] text-slate-400">Total orders distributed across production workflow stages</p>
+            </div>
+            <button onclick="switchTab('transaksi')" class="text-xs font-bold text-copper hover:underline">View Orders</button>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-2">
+            <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase text-amber-800">Received</span>
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              </div>
+              <h4 class="text-2xl sm:text-3xl font-black text-amber-900 mt-2" id="stat-order-diterima">0</h4>
+              <span class="text-[10px] text-amber-700 font-medium mt-1">Pending Queue</span>
+            </div>
+
+            <div class="p-3 bg-blue-50/80 rounded-xl border border-blue-200 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase text-blue-800">In Progress</span>
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+              </div>
+              <h4 class="text-2xl sm:text-3xl font-black text-blue-900 mt-2" id="stat-order-proses">0</h4>
+              <span class="text-[10px] text-blue-700 font-medium mt-1">Sewing / Pattern</span>
+            </div>
+
+            <div class="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase text-emerald-800">Completed</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              </div>
+              <h4 class="text-2xl sm:text-3xl font-black text-emerald-900 mt-2" id="stat-order-selesai">0</h4>
+              <span class="text-[10px] text-emerald-700 font-medium mt-1">Ready for Pickup</span>
+            </div>
+
+            <div class="p-3 bg-purple-50/80 rounded-xl border border-purple-200 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase text-purple-800">Picked Up</span>
+                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+              </div>
+              <h4 class="text-2xl sm:text-3xl font-black text-purple-900 mt-2" id="stat-order-diambil">0</h4>
+              <span class="text-[10px] text-purple-700 font-medium mt-1">Handed Over</span>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span>Total All Orders: <b class="text-slate-800 font-bold" id="stat-order-total-all">0</b></span>
+            <span>Active Production: <b class="text-amber-700 font-bold" id="stat-order-total-active">0</b></span>
+          </div>
+        </div>
+
+        <!-- Sub-block B: Donut Chart Custom vs Repair -->
+        <div class="lg:col-span-5 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <h3 class="font-bold text-sm sm:text-base text-slate-800 flex items-center gap-2">
+                <i data-lucide="pie-chart" class="w-4 h-4 text-copper"></i> Custom vs Repair Ratio
+              </h3>
+              <p class="text-[11px] text-slate-400">Proportion of custom garment items vs alteration/repair jobs</p>
+            </div>
+          </div>
+
+          <div id="dash-pie-container" class="flex flex-col sm:flex-row items-center justify-center gap-4 py-2">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BLOCK 3: NEAREST UPCOMING SCHEDULE DEADLINES -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <h3 class="font-bold text-sm sm:text-base text-slate-800 flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i> Upcoming Deadlines
+            </h3>
+            <p class="text-[11px] text-slate-400">Active orders with the nearest due dates requiring attention</p>
+          </div>
+          <button onclick="switchTab('transaksi')" class="text-xs font-semibold text-copper hover:underline">View All Orders</button>
+        </div>
+        <div class="overflow-x-auto no-scrollbar">
+          <table class="w-full text-xs text-left min-w-[550px]">
+            <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Deadline</th>
+                <th class="py-2.5 px-3">Customer</th>
+                <th class="py-2.5 px-3">Order Items</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3 text-right">Balance Due</th>
+                <th class="py-2.5 px-3 text-center">Quick Action</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-urgent-list" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BLOCK 4: DAILY INCOME/EXPENSE CHART & ANNUAL NET CASHFLOW LINE CHART -->
+      <div class="space-y-4">
+        
+        <!-- 4A. DAILY INCOME & EXPENSE CHART (MONTHLY VIEW) -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+          <div class="flex flex-wrap justify-between items-center mb-4 gap-2 pb-3 border-b border-slate-100">
+            <div>
+              <h3 class="font-bold text-sm sm:text-base text-slate-800 flex items-center gap-2">
+                <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-600"></i> Daily Income & Expense Chart
+              </h3>
+              <p class="text-[11px] text-slate-400">Displays paired daily bars for cash income (green) and expenses (rose) per calendar date</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <div class="hidden sm:flex items-center gap-3 text-xs bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                <span class="flex items-center gap-1.5 text-slate-600 font-semibold">
+                  <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Income
+                </span>
+                <span class="flex items-center gap-1.5 text-slate-600 font-semibold">
+                  <span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Expense
+                </span>
+              </div>
+
+              <div class="flex items-center gap-1">
+                <button onclick="changeDashboardMonth(-1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
+                  <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+                <span id="dash-chart-month" class="text-xs font-bold text-slate-700 min-w-[105px] text-center bg-slate-50 px-2 py-1.5 border border-slate-200 rounded-lg">Month</span>
+                <button onclick="changeDashboardMonth(1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
+                  <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-end gap-1 sm:gap-2 h-56 w-full overflow-x-auto no-scrollbar pt-10 pb-1 relative border-b border-slate-100" id="dash-daily-inout-bars"></div>
+
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 text-xs">
+            <div class="p-3 bg-emerald-50/70 rounded-xl border border-emerald-100 flex justify-between items-center">
+              <div>
+                <span class="text-[10px] text-emerald-700 font-bold uppercase">Total Monthly Income</span>
+                <h4 class="text-sm sm:text-base font-black text-emerald-800 mt-0.5 truncate" id="dash-month-total-in">0</h4>
+              </div>
+              <span class="p-2 bg-emerald-100/80 text-emerald-700 rounded-lg"><i data-lucide="arrow-down-left" class="w-4 h-4"></i></span>
+            </div>
+            <div class="p-3 bg-rose-50/70 rounded-xl border border-rose-100 flex justify-between items-center">
+              <div>
+                <span class="text-[10px] text-rose-700 font-bold uppercase">Total Monthly Expense</span>
+                <h4 class="text-sm sm:text-base font-black text-rose-800 mt-0.5 truncate" id="dash-month-total-out">0</h4>
+              </div>
+              <span class="p-2 bg-rose-100/80 text-rose-700 rounded-lg"><i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+              <div>
+                <span class="text-[10px] text-slate-500 font-bold uppercase">Monthly Net Balance</span>
+                <h4 class="text-sm sm:text-base font-black mt-0.5 truncate" id="dash-month-net-balance">0</h4>
+              </div>
+              <span class="p-2 bg-slate-200 text-slate-700 rounded-lg"><i data-lucide="scale" class="w-4 h-4"></i></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4B. ANNUAL NET CASHFLOW LINE GRAPH -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+          <div class="flex flex-wrap justify-between items-center mb-4 gap-2 pb-3 border-b border-slate-100">
+            <div>
+              <h3 class="font-bold text-sm sm:text-base text-slate-800 flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-4 h-4 text-copper"></i> Annual Net Cashflow Line Graph (Income - Expense)
+              </h3>
+              <p class="text-[11px] text-slate-400">Monthly net surplus / deficit line chart showing net cash performance across January - December</p>
+            </div>
+            
+            <div class="flex items-center gap-1.5">
+              <button onclick="changeDashboardYear(-1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <span id="dash-chart-year" class="text-xs font-bold text-slate-700 min-w-[70px] text-center bg-slate-50 px-2.5 py-1.5 border border-slate-200 rounded-lg">2026</span>
+              <button onclick="changeDashboardYear(1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="dash-year-linechart-container" class="w-full relative py-2"></div>
+
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-center text-xs pt-2 border-t border-slate-100">
+            <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-100">
+              <span class="block text-[10px] text-emerald-600 font-bold uppercase">Total Annual Income</span>
+              <span class="text-xs sm:text-sm font-black text-emerald-800" id="dash-year-in-total">0</span>
+            </div>
+            <div class="p-2.5 bg-rose-50 rounded-xl border border-rose-100">
+              <span class="block text-[10px] text-rose-600 font-bold uppercase">Total Annual Expense</span>
+              <span class="text-xs sm:text-sm font-black text-rose-800" id="dash-year-out-total">0</span>
+            </div>
+            <div class="p-2.5 bg-amber-50 rounded-xl border border-amber-200">
+              <span class="block text-[10px] text-amber-700 font-bold uppercase">Cumulative Net Cashflow</span>
+              <span class="text-xs sm:text-sm font-black text-amber-900" id="dash-year-diff-total">0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- 2. CUSTOMERS PAGE -->
+    <section id="page-pelanggan" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg sm:text-2xl font-bold text-slate-900">Customer Database</h2>
+          <p class="text-xs text-slate-500">Manage contact information and tailored body measurement profiles</p>
+        </div>
+        <button onclick="openCustomerModal()" class="bg-copper text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow hover:bg-amber-600 transition">
+          <i data-lucide="user-plus" class="w-4 h-4"></i> Add Customer
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="p-3 border-b border-slate-100">
+          <input type="text" id="search-customer" oninput="renderCustomers()" placeholder="Search customer by name or phone / WhatsApp..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+        <div class="overflow-x-auto no-scrollbar">
+          <table class="w-full text-xs text-left min-w-[450px]">
+            <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Name & Contact</th>
+                <th class="py-2.5 px-3">Total Orders</th>
+                <th class="py-2.5 px-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customer-table-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ORDERS PAGE -->
+    <section id="page-transaksi" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg sm:text-2xl font-bold text-slate-900">Orders & Jobs</h2>
+          <p class="text-xs text-slate-500">Manage custom garment orders and denim repair / alterations</p>
+        </div>
+        <button onclick="openOrderModal()" class="bg-copper text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow hover:bg-amber-600 transition">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> Create Order
+        </button>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto no-scrollbar">
+          <table class="w-full text-xs text-left min-w-[850px]">
+            <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">ID & Date</th>
+                <th class="py-2.5 px-3">Customer</th>
+                <th class="py-2.5 px-3">Order Items</th>
+                <th class="py-2.5 px-3 text-center">Workload</th>
+                <th class="py-2.5 px-3">Total / Paid</th>
+                <th class="py-2.5 px-3">Balance Due</th>
+                <th class="py-2.5 px-3">Due Date</th>
+                <th class="py-2.5 px-3 text-center">Status</th>
+                <th class="py-2.5 px-3 text-center">Actions / Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SCHEDULE & CAPACITY PAGE -->
+    <section id="page-jadwal" class="tab-content hidden space-y-4">
+      <div>
+        <h2 class="text-lg sm:text-2xl font-bold text-slate-900">Schedule & Daily Capacity</h2>
+        <p class="text-xs text-slate-500">Daily workload capacity and interactive deadline scheduling calendar</p>
+      </div>
+
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-wrap justify-between items-center gap-2">
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-sm sm:text-base text-slate-800" id="calendar-header-title">Calendar</h3>
+            <button onclick="goToCurrentMonth()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-0.5 rounded font-semibold transition">Current Month</button>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="changeCalendarMonth(-1)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <button onclick="changeCalendarMonth(1)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-7 gap-1 text-center font-bold text-[10px] text-slate-400 pb-2 border-b border-slate-100">
+          <span class="text-rose-500">Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        </div>
+        
+        <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-xs pt-1"></div>
+
+        <div id="calendar-selected-details" class="mt-4 pt-4 border-t border-slate-200 text-xs hidden"></div>
+      </div>
+    </section>
+
+    <!-- 5. CASHBOOK PAGE -->
+    <section id="page-kasir" class="tab-content hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg sm:text-2xl font-bold text-slate-900">Cashbook & Bookkeeping</h2>
+          <p class="text-xs text-slate-500">Transaction ledger, today's cash summary, and monthly category breakdown</p>
+        </div>
+        <button onclick="openCashModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow transition">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> Record Cash
+        </button>
+      </div>
+
+      <!-- 1. TODAY'S CASH SUMMARY -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-sm sm:text-base text-slate-800 flex items-center gap-2">
+            <i data-lucide="calendar-clock" class="w-4 h-4 text-emerald-600"></i> Today's Cash Flow
+          </h3>
+          <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold">Today's Realtime</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4">
+          <div class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-100 flex flex-col justify-between">
+            <span class="text-[10px] text-emerald-700 font-bold uppercase">Today's Income</span>
+            <h4 class="text-lg sm:text-2xl font-black text-emerald-800 mt-1 truncate" id="cash-today-in">0</h4>
+          </div>
+          <div class="p-3.5 bg-rose-50 rounded-xl border border-rose-100 flex flex-col justify-between">
+            <span class="text-[10px] text-rose-700 font-bold uppercase">Today's Expense</span>
+            <h4 class="text-lg sm:text-2xl font-black text-rose-800 mt-1 truncate" id="cash-today-out">0</h4>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <span class="text-[10px] text-slate-500 font-bold uppercase">Today's Net Balance</span>
+            <h4 class="text-lg sm:text-2xl font-black text-slate-900 mt-1 truncate" id="cash-today-balance">0</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. OVERALL ACCUMULATIVE CASH SUMMARY -->
+      <div class="grid grid-cols-3 gap-2 sm:gap-4">
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase">Total Cash In</p>
+          <h4 class="text-xs sm:text-base font-bold text-emerald-600 truncate mt-0.5" id="cash-in-total">0</h4>
+        </div>
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase">Total Cash Out</p>
+          <h4 class="text-xs sm:text-base font-bold text-rose-600 truncate mt-0.5" id="cash-out-total">0</h4>
+        </div>
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase">Current Balance</p>
+          <h4 class="text-xs sm:text-base font-black text-slate-900 truncate mt-0.5" id="cash-balance-total">0</h4>
+        </div>
+      </div>
+
+      <!-- 3. MONTHLY CATEGORY BREAKDOWN -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap justify-between items-center gap-2 pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="font-bold text-sm sm:text-base text-slate-800 flex items-center gap-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i> Monthly Category Breakdown
+            </h3>
+            <p class="text-[11px] text-slate-400">Composition of income sources or expense allocation categories</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-semibold">
+              <button onclick="setCashAnalyticsView('out')" id="btn-cash-view-out" class="px-2.5 py-1 rounded-md bg-white text-rose-600 shadow-sm transition">Expense</button>
+              <button onclick="setCashAnalyticsView('in')" id="btn-cash-view-in" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-emerald-700 transition">Income</button>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <button onclick="changeCashCategoryMonth(-1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
+                <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+              </button>
+              <span id="cash-category-month-label" class="text-xs font-bold text-slate-700 min-w-[95px] text-center bg-slate-50 px-2 py-1 border border-slate-200 rounded-lg">Month</span>
+              <button onclick="changeCashCategoryMonth(1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="cash-category-chart-container" class="flex flex-col md:flex-row items-center justify-around gap-6 py-2"></div>
+      </div>
+
+      <!-- 4. CASH TRANSACTION LEDGER TABLE -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="p-3.5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <i data-lucide="list" class="w-4 h-4 text-copper"></i> Transaction Ledger
+            </span>
+            <span class="text-[10px] text-slate-400">Displaying transactions for the selected month</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1">
+              <button onclick="changeLedgerMonth(-1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition" title="Previous Month">
+                <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+              </button>
+              <span id="ledger-month-label" class="text-xs font-bold text-slate-700 min-w-[105px] text-center bg-slate-50 px-2.5 py-1 border border-slate-200 rounded-lg">Month</span>
+              <button onclick="changeLedgerMonth(1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition" title="Next Month">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <button onclick="goToCurrentLedgerMonth()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1 rounded-md font-semibold transition">This Month</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto no-scrollbar">
+          <table class="w-full text-xs text-left min-w-[500px]">
+            <thead class="bg-slate-50 text-slate-400 uppercase text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Date</th>
+                <th class="py-2.5 px-3">Category</th>
+                <th class="py-2.5 px-3">Description</th>
+                <th class="py-2.5 px-3">Type</th>
+                <th class="py-2.5 px-3 text-right">Amount</th>
+                <th class="py-2.5 px-3 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="cashflow-table-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <div id="ledger-monthly-summary" class="p-3 bg-slate-50 border-t border-slate-100 flex flex-wrap justify-between items-center text-xs text-slate-600 gap-2"></div>
+      </div>
+    </section>
+
+    <!-- 6. SETTINGS PAGE -->
+    <section id="page-setting" class="tab-content hidden space-y-4">
+      <div>
+        <h2 class="text-lg sm:text-2xl font-bold text-slate-900">Store & App Settings</h2>
+        <p class="text-xs text-slate-500">Configure currency, measurement units, receipt formats, offline backup, and cloud sync</p>
+      </div>
+
+      <div class="space-y-4 max-w-2xl">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+          <form id="form-config" onsubmit="saveConfig(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+              <div class="sm:col-span-2 bg-amber-50/60 border border-amber-200 p-3.5 rounded-xl">
+                <label class="block text-[11px] font-bold text-amber-900 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="link" class="w-3.5 h-3.5 text-copper"></i> Google Apps Script URL (Cloud Sync)
+                </label>
+                <input type="url" id="conf-script-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-white border border-amber-300 rounded-lg px-3 py-2 text-xs text-slate-800 font-mono focus:ring-2 focus:ring-amber-500">
+                <p class="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+                  Paste the deployed Web App URL from your Google Spreadsheet Apps Script here. If left empty, all data continues to be securely saved locally on this device.
+                </p>
+              </div>
+
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                <label class="block text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                  <i data-lucide="coins" class="w-3.5 h-3.5 text-copper"></i> Currency Selection
+                </label>
+                <select id="conf-currency" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold bg-white focus:ring-2 focus:ring-amber-500">
+                  <option value="IDR">IDR - Indonesian Rupiah (Rp)</option>
+                  <option value="USD">USD - US Dollar ($)</option>
+                  <option value="EUR">EUR - Euro (€)</option>
+                  <option value="SGD">SGD - Singapore Dollar (S$)</option>
+                  <option value="MYR">MYR - Malaysian Ringgit (RM)</option>
+                </select>
+                <p class="text-[9px] text-slate-400">Currency symbol displayed across orders, cashier & receipts.</p>
+              </div>
+
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                <label class="block text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                  <i data-lucide="ruler" class="w-3.5 h-3.5 text-copper"></i> Measurement Unit
+                </label>
+                <select id="conf-size-unit" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold bg-white focus:ring-2 focus:ring-amber-500">
+                  <option value="cm">Centimeter (cm)</option>
+                  <option value="inch">Inch (inch / ")</option>
+                </select>
+                <p class="text-[9px] text-slate-400">Default measurement unit for garment pattern charts.</p>
+              </div>
+
+              <div class="sm:col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                <label class="block text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                  <i data-lucide="printer" class="w-3.5 h-3.5 text-copper"></i> Receipt Paper Format
+                </label>
+                <select id="conf-receipt-format" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold bg-white focus:ring-2 focus:ring-amber-500">
+                  <option value="a5">A5 Portrait (Standard Half-Sheet Invoice 148 x 210 mm)</option>
+                  <option value="a4">A4 Portrait (Full Invoice 210 x 297 mm)</option>
+                  <option value="thermal80">Thermal POS 80mm (Standard Desktop Receipt Printer)</option>
+                  <option value="thermal58">Thermal POS 58mm (Mobile / Bluetooth Mini Printer)</option>
+                </select>
+                <p class="text-[9px] text-slate-400">The print receipt layout automatically adapts to the selected paper dimensions.</p>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Store / Brand Name</label>
+                <input type="text" id="conf-name" class="w-full border rounded-lg px-3 py-2 text-xs font-semibold">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Receipt Tagline</label>
+                <input type="text" id="conf-tagline" class="w-full border rounded-lg px-3 py-2 text-xs">
+              </div>
+              
+              <div class="sm:col-span-2 flex flex-col sm:flex-row sm:items-center gap-4 border border-slate-200 p-3.5 rounded-xl bg-slate-50">
+                <div class="shrink-0 flex items-center justify-center">
+                  <div class="w-16 h-16 bg-white border border-slate-200 rounded-lg p-1 flex items-center justify-center shadow-sm overflow-hidden relative group">
+                    <img id="logo-preview" src="" class="max-w-full max-h-full object-contain hidden" alt="Logo Preview">
+                    <span id="logo-placeholder" class="text-[10px] text-slate-400 text-center font-medium">No Logo</span>
+                  </div>
+                </div>
+                <div class="flex-1 space-y-1.5">
+                  <label class="block text-[11px] font-bold text-slate-700">Store Logo (Receipt & Header)</label>
+                  <div class="flex items-center gap-2">
+                    <input type="file" id="conf-logo" accept="image/png, image/jpeg, image/webp" class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-200 file:text-slate-700 hover:file:bg-slate-300 cursor-pointer" onchange="previewLogo(event)">
+                    <button type="button" id="btn-remove-logo" onclick="removeLogo()" class="hidden px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-md text-xs font-semibold border border-rose-200 shrink-0 transition" title="Remove Logo">
+                      Remove
+                    </button>
+                  </div>
+                  <p class="text-[10px] text-slate-500">Supports PNG, JPG, or WEBP image files.</p>
+                </div>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Complete Address</label>
+                <input type="text" id="conf-address" class="w-full border rounded-lg px-3 py-2 text-xs">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Admin WhatsApp / Phone Number</label>
+                <input type="text" id="conf-phone" class="w-full border rounded-lg px-3 py-2 text-xs">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Social Media Handle (IG/TikTok)</label>
+                <input type="text" id="conf-socmed" class="w-full border rounded-lg px-3 py-2 text-xs">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Maximum Daily Workload Capacity (Points / Pcs / Hours)</label>
+                <input type="number" id="conf-capacity" min="1" class="w-full border rounded-lg px-3 py-2 text-xs font-bold text-amber-700" placeholder="e.g. 20">
+                <p class="text-[9px] text-slate-500 mt-1">Daily capacity limit used to calculate schedule workload percentages on the calendar.</p>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t mt-4 flex justify-between items-center">
+              <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg text-xs font-bold w-full sm:w-auto transition flex items-center justify-center gap-1.5 shadow">
+                <i data-lucide="save" class="w-4 h-4"></i> Save Settings
+              </button>
+              <button type="button" onclick="testConnection()" class="text-xs font-semibold text-copper hover:underline hidden sm:inline-block">
+                Test Cloud Connection
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="database" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Independent Data Backup & Restore (.json)</h3>
+              <p class="text-[11px] text-slate-400">Download complete workshop database backup for safe offline storage, or restore from a previously exported JSON file</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
+              <div>
+                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <i data-lucide="download" class="w-3.5 h-3.5 text-copper"></i> Backup Database
+                </span>
+                <p class="text-[10px] text-slate-500 mt-1">Export all customers, orders, cashbook, measurement charts, and configurations to a .json file</p>
+              </div>
+              <button type="button" onclick="downloadBackupJson()" class="bg-copper hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 shadow">
+                <i data-lucide="download" class="w-4 h-4"></i> Download Backup (.json)
+              </button>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
+              <div>
+                <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <i data-lucide="upload" class="w-3.5 h-3.5 text-emerald-600"></i> Restore Database
+                </span>
+                <p class="text-[10px] text-slate-500 mt-1">Upload a .json backup file to instantly restore your entire database</p>
+              </div>
+              <div>
+                <input type="file" id="input-restore-json" accept=".json,application/json" class="hidden" onchange="handleRestoreFile(event)">
+                <button type="button" onclick="triggerRestoreJson()" class="w-full bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 shadow">
+                  <i data-lucide="upload" class="w-4 h-4"></i> Choose & Restore File (.json)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- IN-PAGE CONFIRMATION MODAL -->
+  <div id="modal-confirm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-3 z-50">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center gap-3">
+        <div id="confirm-modal-icon-bg" class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+          <i data-lucide="help-circle" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-slate-900" id="confirm-modal-title">Confirmation</h3>
+          <p class="text-xs text-slate-500 mt-0.5" id="confirm-modal-desc">Are you sure you want to proceed?</p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+        <button type="button" onclick="closeModal('modal-confirm')" class="px-3.5 py-2 border rounded-lg text-slate-600 text-xs font-semibold hover:bg-slate-50 transition">Cancel</button>
+        <button type="button" id="confirm-btn-ok" class="bg-copper hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER PROFILE CARD & ORDER HISTORY MODAL -->
+  <div id="modal-customer-card" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-3 z-50">
+    <div class="bg-white w-full max-w-2xl rounded-2xl p-4 sm:p-6 shadow-2xl max-h-[92vh] flex flex-col">
+      <div class="flex justify-between items-start pb-3 border-b border-slate-200">
+        <div>
+          <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Customer Profile & History</span>
+          <h3 class="text-xl font-black text-slate-900" id="card-cust-name">-</h3>
+          <p class="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-0.5" id="card-cust-phone-wrapper">
+            <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span id="card-cust-phone">-</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="card-btn-wa" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 p-2 rounded-lg text-xs font-bold flex items-center gap-1 transition">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">WhatsApp</span>
+          </button>
+          <button id="card-btn-new-order" class="bg-copper hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1 transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>New Order</span>
+          </button>
+          <button onclick="closeModal('modal-customer-card')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-4 space-y-4 pr-1">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+          <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="block text-[10px] text-slate-400 font-bold uppercase">Total Orders</span>
+            <span class="text-sm sm:text-base font-black text-slate-800" id="card-total-order">0</span>
+          </div>
+          <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="block text-[10px] text-slate-400 font-bold uppercase">Active Orders</span>
+            <span class="text-sm sm:text-base font-black text-amber-600" id="card-active-order">0</span>
+          </div>
+          <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="block text-[10px] text-slate-400 font-bold uppercase">Total Spent</span>
+            <span class="text-xs sm:text-sm font-black text-emerald-700" id="card-total-spent">0</span>
+          </div>
+          <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="block text-[10px] text-slate-400 font-bold uppercase">Unpaid Balance</span>
+            <span class="text-xs sm:text-sm font-black text-rose-600" id="card-total-remaining">0</span>
+          </div>
+        </div>
+
+        <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-3.5">
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+              <i data-lucide="ruler" class="w-3.5 h-3.5 text-copper"></i> Body Measurement Profile
+            </h4>
+            <button id="card-btn-edit-size" class="text-[10px] text-amber-700 font-bold hover:underline">Edit Measurements</button>
+          </div>
+          <div id="card-size-summary" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-700"></div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold text-slate-800 mb-2 flex items-center gap-1.5">
+            <i data-lucide="package" class="w-4 h-4 text-copper"></i> All Order History
+          </h4>
+          <div id="card-orders-container" class="space-y-2.5"></div>
+        </div>
+      </div>
+      
+      <div class="pt-3 border-t border-slate-200 flex justify-end">
+        <button onclick="closeModal('modal-customer-card')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold">
+          Close Profile
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER INPUT MODAL -->
+  <div id="modal-customer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-3 z-50">
+    <div class="bg-white w-full max-w-2xl rounded-2xl p-4 sm:p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <h3 class="text-base font-bold text-slate-900 mb-2" id="customer-modal-title">Add New Customer</h3>
+      
+      <form id="form-customer" onsubmit="saveCustomer(event)" class="space-y-4">
+        <input type="hidden" id="cust-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Full Name *</label>
+            <input type="text" id="cust-name" required placeholder="Customer full name" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">WhatsApp / Phone Number *</label>
+            <input type="tel" id="cust-phone" required placeholder="e.g. +1... or 08..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex border-b border-slate-200 text-xs font-semibold space-x-2">
+            <button type="button" onclick="switchSizeTab('pants')" id="tab-btn-pants" class="size-tab-btn py-2 px-3 border-b-2 border-amber-600 text-amber-700">Trousers / Jeans</button>
+            <button type="button" onclick="switchSizeTab('shirt')" id="tab-btn-shirt" class="size-tab-btn py-2 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700">Shirts / Tops</button>
+            <button type="button" onclick="switchSizeTab('skirt')" id="tab-btn-skirt" class="size-tab-btn py-2 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700">Skirts / Dresses</button>
+            <button type="button" onclick="switchSizeTab('others')" id="tab-btn-others" class="size-tab-btn py-2 px-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700">Others / Custom</button>
+          </div>
+
+          <div id="size-pane-pants" class="size-pane pt-3 space-y-2">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Waist <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-waist" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Front Rise <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-frontrise" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Back Rise <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-backrise" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Hip <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-hip" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Thigh <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-thigh" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Knee <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-knee" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Leg Opening <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-legopening" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Inseam <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-inseam" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Total Length <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="p-length" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Pattern & Fit Notes</label>
+              <input type="text" id="p-notes" placeholder="e.g. Slim straight, 14oz raw selvedge" class="w-full border rounded-lg px-2.5 py-1.5 text-xs">
+            </div>
+          </div>
+
+          <div id="size-pane-shirt" class="size-pane pt-3 space-y-2 hidden">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Shoulder Width <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="s-lebar-bahu" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Chest <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="s-lingkar-dada" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Shirt Length <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="s-panjang-baju" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Sleeve Length <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="s-panjang-lengan" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Armhole <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="s-kerung-lengan" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Wrist / Cuff <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="s-pergelangan" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Waist / Belly <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="s-lingkar-perut" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Pattern Notes</label>
+              <input type="text" id="s-catatan" class="w-full border rounded-lg px-2.5 py-1.5 text-xs">
+            </div>
+          </div>
+
+          <div id="size-pane-skirt" class="size-pane pt-3 space-y-2 hidden">
+            <div class="grid grid-cols-2 gap-2.5">
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Waist <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="sk-lingkar-pinggang" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Hip <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="sk-lingkar-pinggul" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Skirt Length <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="sk-panjang-rok" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Bottom Hem Width <span class="size-unit-badge text-slate-400 font-normal"></span></label><input type="text" id="sk-lebar-bawah" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Skirt Pattern Notes</label>
+              <input type="text" id="sk-catatan" class="w-full border rounded-lg px-2.5 py-1.5 text-xs">
+            </div>
+          </div>
+
+          <div id="size-pane-others" class="size-pane pt-3 space-y-2 hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Item / Accessory Name</label><input type="text" id="o-nama-barang" placeholder="e.g. Denim Tote Bag / Apron" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+              <div><label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Dimensions / Size</label><input type="text" id="o-dimensi" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></div>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-600 font-semibold mb-0.5">Details & Instructions</label>
+              <textarea id="o-catatan" rows="3" class="w-full border rounded-lg px-2.5 py-1.5 text-xs"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeModal('modal-customer')" class="px-3 py-2 border rounded-lg text-slate-600 text-xs hover:bg-slate-50 transition">Cancel</button>
+          <button type="submit" class="bg-copper text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-amber-600 transition">Save Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ORDER MODAL -->
+  <div id="modal-order" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-3 z-50">
+    <div class="bg-white w-full max-w-2xl rounded-2xl p-4 sm:p-6 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <h3 class="text-base font-bold text-slate-900 mb-3" id="order-modal-title">Create New Order</h3>
+      <form id="form-order" onsubmit="saveOrder(event)" class="space-y-4">
+        <input type="hidden" id="order-id">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Select Customer *</label>
+            <select id="order-customer" required class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs focus:ring-2 focus:ring-amber-500"></select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Entry Date *</label>
+            <input type="date" id="order-date-in" required class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700">Order Items & Services</label>
+            </div>
+            <button type="button" onclick="addOrderItemRow()" class="text-xs bg-amber-50 text-amber-700 border border-amber-300 hover:bg-amber-100 px-2.5 py-1 rounded-lg font-bold">+ Add Item</button>
+          </div>
+          <div id="order-items-list" class="space-y-2.5"></div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-1">Total Workload</label>
+            <div class="flex items-center gap-1">
+              <span id="order-points-total" class="font-black text-amber-700 text-sm">0</span>
+              <span class="text-[10px] text-slate-400">Points</span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-1">Total Price</label>
+            <input type="number" id="order-total" readonly class="w-full bg-white border rounded-lg px-2 py-1.5 font-bold text-slate-800">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-1">Deposit Paid</label>
+            <input type="number" id="order-dp" oninput="calculateBalance()" value="0" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 font-semibold text-emerald-600">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-1">Balance Due</label>
+            <input type="number" id="order-remaining" readonly class="w-full bg-white border rounded-lg px-2 py-1.5 font-black text-rose-600">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Target Due Date *</label>
+            <input type="date" id="order-date-due" required class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Production Status</label>
+            <select id="order-status" class="w-full border border-slate-300 rounded-lg px-2.5 py-2 text-xs font-semibold">
+              <option value="received">Received</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="picked_up">Picked Up</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeModal('modal-order')" class="px-3 py-2 border rounded-lg text-slate-600 text-xs hover:bg-slate-50 transition">Cancel</button>
+          <button type="submit" class="bg-copper text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-amber-600 transition">Save Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CASH TRANSACTION MODAL -->
+  <div id="modal-cash" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-3 z-50">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-4 sm:p-6 shadow-2xl">
+      <h3 class="text-base font-bold text-slate-900 mb-3">Record Cash Flow</h3>
+      <form id="form-cash" onsubmit="saveCashflow(event)" class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-600 mb-1">Date</label>
+          <input type="date" id="cash-date" required class="w-full border rounded-lg px-2.5 py-1.5 text-xs">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-600 mb-1">Transaction Type</label>
+          <select id="cash-type" onchange="updateCategoryOptions()" class="w-full border rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+            <option value="in">Cash In (Income)</option>
+            <option value="out">Cash Out (Expense)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-600 mb-1">Category</label>
+          <select id="cash-category" class="w-full border rounded-lg px-2.5 py-1.5 text-xs font-medium"></select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-600 mb-1">Description / Memo</label>
+          <input type="text" id="cash-desc" required placeholder="e.g. Needles & Thread supply purchase" class="w-full border rounded-lg px-2.5 py-1.5 text-xs">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-600 mb-1">Amount</label>
+          <input type="number" id="cash-amount" min="1" required class="w-full border rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t">
+          <button type="button" onclick="closeModal('modal-cash')" class="px-3 py-2 border rounded-lg text-slate-600 text-xs hover:bg-slate-50 transition">Cancel</button>
+          <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-emerald-700 transition">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script src="app.js"></script>
+</body>
+</html>
