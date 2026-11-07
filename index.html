@@ -8,13 +8,9 @@
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#111a26">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Workshop App">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
 
-  <!-- Tailwind & Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -30,7 +26,7 @@
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row pb-20 md:pb-0 relative">
 
   <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none max-w-sm w-full px-2"></div>
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-2"></div>
 
   <!-- MOBILE TOP BAR -->
   <header class="md:hidden bg-denim-dark text-white p-4 flex justify-between items-center shadow-md sticky top-0 z-30">
@@ -129,7 +125,9 @@
   <!-- MAIN VIEWPORT -->
   <main class="flex-1 w-full max-w-full p-4 sm:p-6 md:p-8 overflow-x-hidden overflow-y-auto">
 
-    <!-- 1. DASHBOARD PAGE -->
+    <!-- ======================================================== -->
+    <!-- 1. DASHBOARD PAGE                                        -->
+    <!-- ======================================================== -->
     <section id="page-dashboard" class="tab-content space-y-5">
       <div class="hidden md:flex justify-between items-center pb-4 border-b border-slate-200">
         <div>
@@ -164,7 +162,7 @@
       <!-- BLOCK 2: ORDER COUNTS BY STATUS & DONUT CHART (CUSTOM VS REPAIR) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
         
-        <!-- Sub-block A: Order Count by Status -->
+        <!-- Sub-block A: Order Count by Status (Received, In Progress, Completed, Picked Up) -->
         <div class="lg:col-span-7 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <div class="flex justify-between items-center mb-3">
             <div>
@@ -177,6 +175,7 @@
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-2">
+            <!-- 1. Received -->
             <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex flex-col justify-between">
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase text-amber-800">Received</span>
@@ -186,6 +185,7 @@
               <span class="text-[10px] text-amber-700 font-medium mt-1">Pending Queue</span>
             </div>
 
+            <!-- 2. In Progress -->
             <div class="p-3 bg-blue-50/80 rounded-xl border border-blue-200 flex flex-col justify-between">
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase text-blue-800">In Progress</span>
@@ -195,6 +195,7 @@
               <span class="text-[10px] text-blue-700 font-medium mt-1">Sewing / Pattern</span>
             </div>
 
+            <!-- 3. Completed -->
             <div class="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 flex flex-col justify-between">
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase text-emerald-800">Completed</span>
@@ -204,6 +205,7 @@
               <span class="text-[10px] text-emerald-700 font-medium mt-1">Ready for Pickup</span>
             </div>
 
+            <!-- 4. Picked Up -->
             <div class="p-3 bg-purple-50/80 rounded-xl border border-purple-200 flex flex-col justify-between">
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase text-purple-800">Picked Up</span>
@@ -232,6 +234,7 @@
           </div>
 
           <div id="dash-pie-container" class="flex flex-col sm:flex-row items-center justify-center gap-4 py-2">
+            <!-- Rendered by JS -->
           </div>
         </div>
 
@@ -279,6 +282,7 @@
             </div>
             
             <div class="flex items-center gap-2">
+              <!-- Legend -->
               <div class="hidden sm:flex items-center gap-3 text-xs bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
                 <span class="flex items-center gap-1.5 text-slate-600 font-semibold">
                   <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Income
@@ -288,6 +292,7 @@
                 </span>
               </div>
 
+              <!-- Month Navigation -->
               <div class="flex items-center gap-1">
                 <button onclick="changeDashboardMonth(-1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
                   <i data-lucide="chevron-left" class="w-4 h-4"></i>
@@ -300,8 +305,10 @@
             </div>
           </div>
 
+          <!-- Dual Daily Bars Container -->
           <div class="flex items-end gap-1 sm:gap-2 h-56 w-full overflow-x-auto no-scrollbar pt-10 pb-1 relative border-b border-slate-100" id="dash-daily-inout-bars"></div>
 
+          <!-- Selected Month Financial Summary -->
           <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 text-xs">
             <div class="p-3 bg-emerald-50/70 rounded-xl border border-emerald-100 flex justify-between items-center">
               <div>
@@ -348,8 +355,12 @@
             </div>
           </div>
 
-          <div id="dash-year-linechart-container" class="w-full relative py-2"></div>
+          <!-- Responsive SVG Line Chart -->
+          <div id="dash-year-linechart-container" class="w-full relative py-2">
+            <!-- Generated via SVG in JavaScript -->
+          </div>
 
+          <!-- Annual Summary Cards -->
           <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-center text-xs pt-2 border-t border-slate-100">
             <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-100">
               <span class="block text-[10px] text-emerald-600 font-bold uppercase">Total Annual Income</span>
@@ -370,7 +381,9 @@
 
     </section>
 
-    <!-- 2. CUSTOMERS PAGE -->
+    <!-- ======================================================== -->
+    <!-- 2. CUSTOMERS PAGE                                        -->
+    <!-- ======================================================== -->
     <section id="page-pelanggan" class="tab-content hidden space-y-4">
       <div class="flex justify-between items-center">
         <div>
@@ -401,7 +414,9 @@
       </div>
     </section>
 
-    <!-- 3. ORDERS PAGE -->
+    <!-- ======================================================== -->
+    <!-- 3. ORDERS PAGE                                           -->
+    <!-- ======================================================== -->
     <section id="page-transaksi" class="tab-content hidden space-y-4">
       <div class="flex justify-between items-center">
         <div>
@@ -435,13 +450,16 @@
       </div>
     </section>
 
-    <!-- 4. SCHEDULE & CAPACITY PAGE -->
+    <!-- ======================================================== -->
+    <!-- 4. SCHEDULE & CAPACITY PAGE                              -->
+    <!-- ======================================================== -->
     <section id="page-jadwal" class="tab-content hidden space-y-4">
       <div>
         <h2 class="text-lg sm:text-2xl font-bold text-slate-900">Schedule & Daily Capacity</h2>
         <p class="text-xs text-slate-500">Daily workload capacity and interactive deadline scheduling calendar</p>
       </div>
 
+      <!-- CALENDAR & QUICK STATUS EDIT -->
       <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div class="flex items-center gap-2">
@@ -464,11 +482,16 @@
         
         <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-xs pt-1"></div>
 
-        <div id="calendar-selected-details" class="mt-4 pt-4 border-t border-slate-200 text-xs hidden"></div>
+        <!-- SELECTED DATE DETAILS WITH STATUS-ONLY QUICK EDIT DROPDOWN (NO PENCIL/PRINT BUTTONS) -->
+        <div id="calendar-selected-details" class="mt-4 pt-4 border-t border-slate-200 text-xs hidden">
+          <!-- Rendered by JS -->
+        </div>
       </div>
     </section>
 
-    <!-- 5. CASHBOOK PAGE -->
+    <!-- ======================================================== -->
+    <!-- 5. CASHBOOK PAGE                                         -->
+    <!-- ======================================================== -->
     <section id="page-kasir" class="tab-content hidden space-y-4">
       <div class="flex justify-between items-center">
         <div>
@@ -532,11 +555,13 @@
           </div>
 
           <div class="flex items-center gap-2">
+            <!-- Type Selector: Expense / Income -->
             <div class="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-semibold">
               <button onclick="setCashAnalyticsView('out')" id="btn-cash-view-out" class="px-2.5 py-1 rounded-md bg-white text-rose-600 shadow-sm transition">Expense</button>
               <button onclick="setCashAnalyticsView('in')" id="btn-cash-view-in" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-emerald-700 transition">Income</button>
             </div>
 
+            <!-- Month Controls -->
             <div class="flex items-center gap-1">
               <button onclick="changeCashCategoryMonth(-1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition">
                 <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
@@ -549,10 +574,11 @@
           </div>
         </div>
 
+        <!-- Monthly Category Chart Container -->
         <div id="cash-category-chart-container" class="flex flex-col md:flex-row items-center justify-around gap-6 py-2"></div>
       </div>
 
-      <!-- 4. CASH TRANSACTION LEDGER TABLE -->
+      <!-- 4. CASH TRANSACTION LEDGER TABLE (MONTH-FILTERED) -->
       <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
         <div class="p-3.5 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2">
           <div>
@@ -562,6 +588,7 @@
             <span class="text-[10px] text-slate-400">Displaying transactions for the selected month</span>
           </div>
 
+          <!-- Month Selector for Transaction Ledger -->
           <div class="flex items-center gap-1.5">
             <div class="flex items-center gap-1">
               <button onclick="changeLedgerMonth(-1)" class="p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-600 border border-slate-200 transition" title="Previous Month">
@@ -592,11 +619,14 @@
           </table>
         </div>
 
+        <!-- Monthly Ledger Summary Footer -->
         <div id="ledger-monthly-summary" class="p-3 bg-slate-50 border-t border-slate-100 flex flex-wrap justify-between items-center text-xs text-slate-600 gap-2"></div>
       </div>
     </section>
 
-    <!-- 6. SETTINGS PAGE -->
+    <!-- ======================================================== -->
+    <!-- 6. SETTINGS PAGE                                         -->
+    <!-- ======================================================== -->
     <section id="page-setting" class="tab-content hidden space-y-4">
       <div>
         <h2 class="text-lg sm:text-2xl font-bold text-slate-900">Store & App Settings</h2>
@@ -604,10 +634,12 @@
       </div>
 
       <div class="space-y-4 max-w-2xl">
+        <!-- GENERAL CONFIGURATION FORM -->
         <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
           <form id="form-config" onsubmit="saveConfig(event)" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               
+              <!-- CLOUD SYNC -->
               <div class="sm:col-span-2 bg-amber-50/60 border border-amber-200 p-3.5 rounded-xl">
                 <label class="block text-[11px] font-bold text-amber-900 mb-1 flex items-center gap-1.5">
                   <i data-lucide="link" class="w-3.5 h-3.5 text-copper"></i> Google Apps Script URL (Cloud Sync)
@@ -618,6 +650,7 @@
                 </p>
               </div>
 
+              <!-- CURRENCY, MEASUREMENT UNIT, RECEIPT FORMAT -->
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
                 <label class="block text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
                   <i data-lucide="coins" class="w-3.5 h-3.5 text-copper"></i> Currency Selection
@@ -656,6 +689,7 @@
                 <p class="text-[9px] text-slate-400">The print receipt layout automatically adapts to the selected paper dimensions.</p>
               </div>
 
+              <!-- STORE NAME & TAGLINE -->
               <div>
                 <label class="block text-[11px] font-bold text-slate-700 mb-1">Store / Brand Name</label>
                 <input type="text" id="conf-name" class="w-full border rounded-lg px-3 py-2 text-xs font-semibold">
@@ -665,6 +699,7 @@
                 <input type="text" id="conf-tagline" class="w-full border rounded-lg px-3 py-2 text-xs">
               </div>
               
+              <!-- LOGO PREVIEW & UPLOAD SECTION -->
               <div class="sm:col-span-2 flex flex-col sm:flex-row sm:items-center gap-4 border border-slate-200 p-3.5 rounded-xl bg-slate-50">
                 <div class="shrink-0 flex items-center justify-center">
                   <div class="w-16 h-16 bg-white border border-slate-200 rounded-lg p-1 flex items-center justify-center shadow-sm overflow-hidden relative group">
@@ -714,6 +749,7 @@
           </form>
         </div>
 
+        <!-- INDEPENDENT DATA BACKUP & RESTORE (.JSON) -->
         <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-3">
           <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
             <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -726,6 +762,7 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <!-- Backup Button -->
             <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
               <div>
                 <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -738,6 +775,7 @@
               </button>
             </div>
 
+            <!-- Restore Button -->
             <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between space-y-2">
               <div>
                 <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -1056,7 +1094,2186 @@
     </div>
   </div>
 
-  <!-- APPLICATION JAVASCRIPT -->
-  <script src="app.js"></script>
+  <!-- SCRIPT LOGIC (COMPREHENSIVELY IN ENGLISH) -->
+  <script>
+    // Cash Categories Configuration (English)
+    const CASH_CATEGORIES = {
+      in: [
+        { value: 'order', label: 'Order / Sales Payment', color: '#10b981' },
+        { value: 'other_income', label: 'Other Income', color: '#06b6d4' }
+      ],
+      out: [
+        { value: 'tools_materials', label: 'Tools & Materials', color: '#f59e0b' },
+        { value: 'operational', label: 'Operations & Utilities', color: '#6366f1' },
+        { value: 'meals', label: 'Meals & Refreshments', color: '#f97316' },
+        { value: 'salary', label: 'Salaries & Wages', color: '#a855f7' },
+        { value: 'other_expense', label: 'Other Expenses', color: '#64748b' }
+      ]
+    };
+
+    // Store Configuration State
+    let appConfig = {
+      storeName: "BRKH DENIM",
+      tagline: "RAW, AUTHENTIC, DURABLE",
+      address: "Jl. Gajayana 21 B Malang",
+      phone: "085648492858",
+      socialMedia: "@brkhdenim",
+      dailyCapacity: 20,
+      scriptUrl: "",
+      logo: "",
+      currency: "IDR",
+      sizeUnit: "cm",
+      receiptFormat: "a5"
+    };
+
+    try {
+      const savedConfig = localStorage.getItem('brkh_config');
+      if (savedConfig) {
+        appConfig = { ...appConfig, ...JSON.parse(savedConfig) };
+      }
+    } catch (e) {
+      console.warn("Error reading local config:", e);
+    }
+    
+    let currentLogoBase64 = appConfig.logo || "";
+
+    function getActiveScriptUrl() {
+      return (appConfig.scriptUrl || "").trim();
+    }
+
+    // In-memory application data
+    let customers = [];
+    let orders = [];
+    let cashflow = [];
+    let sizePants = [];
+    let sizeShirts = [];
+    let sizeSkirts = [];
+    let sizeOthers = [];
+
+    try {
+      customers = JSON.parse(localStorage.getItem('brkh_customers')) || [];
+      orders = JSON.parse(localStorage.getItem('brkh_orders')) || [];
+      cashflow = JSON.parse(localStorage.getItem('brkh_cashflow')) || [];
+      sizePants = JSON.parse(localStorage.getItem('brkh_size_pants')) || [];
+      sizeShirts = JSON.parse(localStorage.getItem('brkh_size_shirts')) || [];
+      sizeSkirts = JSON.parse(localStorage.getItem('brkh_size_skirts')) || [];
+      sizeOthers = JSON.parse(localStorage.getItem('brkh_size_others')) || [];
+    } catch (e) {
+      console.warn("Error reading data from storage:", e);
+    }
+
+    // Date Navigation State
+    let calendarCurrentDate = new Date();
+    let dashChartDate = new Date();
+    let dashYearDate = new Date();
+    let cashCategoryMonthDate = new Date();
+    let ledgerMonthDate = new Date();
+    let cashAnalyticsActiveType = 'out';
+    let selectedCalendarDateStr = null;
+
+    // Toast Notification System
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-600 text-white' : type === 'error' ? 'bg-rose-600 text-white' : 'bg-slate-800 text-white';
+      const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-triangle' : 'info';
+      el.className = `${bg} px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2 pointer-events-auto transition-all transform duration-200 translate-y-2 opacity-0`;
+      el.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
+      container.appendChild(el);
+      lucide.createIcons();
+      requestAnimationFrame(() => {
+        el.classList.remove('translate-y-2', 'opacity-0');
+      });
+      setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => el.remove(), 300);
+      }, 3500);
+    }
+
+    // In-page Confirmation Modal
+    let confirmActionCallback = null;
+    function showConfirmModal(title, desc, onConfirm, confirmText = 'Continue', isDanger = false) {
+      document.getElementById('confirm-modal-title').innerText = title;
+      document.getElementById('confirm-modal-desc').innerText = desc;
+      const okBtn = document.getElementById('confirm-btn-ok');
+      const iconBg = document.getElementById('confirm-modal-icon-bg');
+      if (okBtn) {
+        okBtn.innerText = confirmText;
+        okBtn.className = isDanger ? 'bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition' : 'bg-copper hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition';
+      }
+      if (iconBg) {
+        iconBg.className = `w-10 h-10 rounded-xl ${isDanger ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-700'} flex items-center justify-center shrink-0`;
+      }
+      confirmActionCallback = onConfirm;
+      openModal('modal-confirm');
+      lucide.createIcons();
+    }
+
+    document.getElementById('confirm-btn-ok')?.addEventListener('click', () => {
+      closeModal('modal-confirm');
+      if (typeof confirmActionCallback === 'function') {
+        const action = confirmActionCallback;
+        confirmActionCallback = null;
+        action();
+      }
+    });
+
+    // Dynamic Multi-Currency Formatter
+    function formatCurrency(num) {
+      const val = Number(num) || 0;
+      const curr = appConfig.currency || 'IDR';
+      if (curr === 'USD') return '$' + val.toLocaleString('en-US');
+      if (curr === 'EUR') return '€' + val.toLocaleString('de-DE');
+      if (curr === 'SGD') return 'S$' + val.toLocaleString('en-SG');
+      if (curr === 'MYR') return 'RM' + val.toLocaleString('ms-MY');
+      return 'Rp ' + val.toLocaleString('id-ID');
+    }
+    const formatRp = (num) => formatCurrency(num);
+
+    function cleanDateStr(d) {
+      if (!d) return '';
+      if (d instanceof Date) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      }
+      let str = String(d).trim();
+      if (str.includes('T')) {
+        const dateObj = new Date(str);
+        if (!isNaN(dateObj.getTime())) {
+          return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+        }
+        str = str.split('T')[0];
+      }
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length === 3) {
+          if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+          else if (parts[2].length === 4) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+      }
+      if (str.includes('-')) {
+        const parts = str.split('-');
+        if (parts.length === 3 && parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+      }
+      return str;
+    }
+
+    // Status Normalization (supports both new English & legacy Indonesian keys)
+    function normalizeStatus(s) {
+      if (!s) return 'received';
+      const lower = String(s).toLowerCase();
+      if (lower === 'diterima' || lower === 'received') return 'received';
+      if (lower === 'proses' || lower === 'in_progress' || lower === 'in progress') return 'in_progress';
+      if (lower === 'selesai' || lower === 'completed') return 'completed';
+      if (lower === 'diambil' || lower === 'picked_up' || lower === 'picked up') return 'picked_up';
+      return lower;
+    }
+
+    function checkIsLate(order) {
+      const s = normalizeStatus(order.status);
+      if (s === 'completed' || s === 'picked_up') return false;
+      const due = cleanDateStr(order.dateDue);
+      if (!due || due.length !== 10) return false;
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      return due < todayStr;
+    }
+
+    function updateSyncUI(text, isError = false) {
+      const mob = document.getElementById('sync-status-mobile');
+      const desk = document.getElementById('sync-status-desktop');
+      if (mob) {
+        mob.innerText = text;
+        mob.className = `text-[10px] px-2 py-0.5 rounded-full border ${isError ? 'bg-rose-900/60 border-rose-700 text-rose-200' : 'bg-slate-800 border-slate-700 text-slate-300'}`;
+      }
+      if (desk) {
+        desk.innerText = `Status: ${text}`;
+        desk.className = isError ? 'text-rose-400 font-medium' : 'text-slate-300';
+      }
+    }
+
+    async function syncDataFromCloud() {
+      const scriptUrl = getActiveScriptUrl();
+      if (!scriptUrl) { 
+        updateSyncUI("Local"); 
+        return; 
+      }
+      updateSyncUI("Syncing...");
+      try {
+        const res = await fetch(scriptUrl);
+        const data = await res.json();
+        
+        customers = data.customers || [];
+        orders = (data.orders || []).map(o => ({ 
+          ...o, 
+          status: normalizeStatus(o.status),
+          dateIn: cleanDateStr(o.dateIn), 
+          dateDue: cleanDateStr(o.dateDue) 
+        }));
+        cashflow = (data.cashflow || []).map(c => ({ ...c, date: cleanDateStr(c.date) }));
+        sizePants = data.sizePants || []; 
+        sizeShirts = data.sizeShirts || []; 
+        sizeSkirts = data.sizeSkirts || []; 
+        sizeOthers = data.sizeOthers || [];
+        
+        if (data.appConfig) {
+          const preservedUrl = appConfig.scriptUrl;
+          appConfig = { ...appConfig, ...data.appConfig, scriptUrl: preservedUrl };
+          currentLogoBase64 = appConfig.logo || "";
+        }
+        
+        saveLocalData();
+        updateSyncUI("Synced");
+        refreshAll();
+        loadConfigUI();
+        showToast("Successfully synchronized with Google Sheets!", "success");
+      } catch (err) {
+        console.error("Sync failed:", err);
+        updateSyncUI("Sync Failed", true);
+        showToast("Cloud sync failed. Please check the Apps Script URL.", "error");
+      }
+    }
+
+    function saveLocalData() {
+      try {
+        localStorage.setItem('brkh_customers', JSON.stringify(customers));
+        localStorage.setItem('brkh_orders', JSON.stringify(orders));
+        localStorage.setItem('brkh_cashflow', JSON.stringify(cashflow));
+        localStorage.setItem('brkh_size_pants', JSON.stringify(sizePants));
+        localStorage.setItem('brkh_size_shirts', JSON.stringify(sizeShirts));
+        localStorage.setItem('brkh_size_skirts', JSON.stringify(sizeSkirts));
+        localStorage.setItem('brkh_size_others', JSON.stringify(sizeOthers));
+        localStorage.setItem('brkh_config', JSON.stringify(appConfig));
+      } catch (e) {
+        console.warn("Storage full error:", e);
+        showToast("Local memory full. Consider removing very large logo images.", "error");
+      }
+    }
+
+    async function saveData() {
+      saveLocalData();
+      refreshAll();
+      const scriptUrl = getActiveScriptUrl();
+      if (scriptUrl) {
+        updateSyncUI("Saving...");
+        try {
+          await fetch(scriptUrl, {
+            method: 'POST', 
+            mode: 'no-cors', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ 
+              action: 'saveAll', 
+              data: { customers, orders, cashflow, sizePants, sizeShirts, sizeSkirts, sizeOthers, appConfig } 
+            })
+          });
+          updateSyncUI("Saved");
+        } catch (err) {
+          console.error("Failed sending data to cloud:", err);
+          updateSyncUI("Saved Locally", true);
+        }
+      }
+    }
+
+    async function testConnection() {
+      const url = (document.getElementById('conf-script-url')?.value || "").trim();
+      if (!url) {
+        showToast("Please enter the Google Apps Script Web App URL first.", "error");
+        return;
+      }
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && typeof data === 'object') {
+          showToast("Connection Successful! Google Apps Script is ready.", "success");
+        } else {
+          showToast("Response received but format was unexpected.", "error");
+        }
+      } catch (e) {
+        showToast("Connection failed. Ensure Apps Script is deployed with 'Who has access: Anyone'.", "error");
+      }
+    }
+
+    // Tab Navigation
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-d-btn').forEach(el => el.classList.remove('bg-amber-600', 'text-white'));
+      document.querySelectorAll('.nav-m-btn').forEach(el => el.classList.remove('text-amber-500', 'font-bold'));
+      
+      const page = document.getElementById('page-' + tab);
+      if (page) page.classList.remove('hidden');
+      
+      const deskBtn = document.getElementById('nav-d-' + tab);
+      if (deskBtn) deskBtn.classList.add('bg-amber-600', 'text-white');
+      
+      const mobBtn = document.getElementById('nav-m-' + tab);
+      if (mobBtn) mobBtn.classList.add('text-amber-500', 'font-bold');
+      
+      const fabP = document.getElementById('fab-pelanggan');
+      const fabT = document.getElementById('fab-transaksi');
+      const fabK = document.getElementById('fab-kasir');
+
+      if (fabP) fabP.classList.add('hidden');
+      if (fabT) fabT.classList.add('hidden');
+      if (fabK) fabK.classList.add('hidden');
+
+      if (tab === 'pelanggan' && fabP) fabP.classList.remove('hidden');
+      if (tab === 'transaksi' && fabT) fabT.classList.remove('hidden');
+      if (tab === 'kasir' && fabK) fabK.classList.remove('hidden');
+
+      refreshAll();
+    }
+
+    function switchSizeTab(tab) {
+      document.querySelectorAll('.size-pane').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.size-tab-btn').forEach(el => {
+        el.classList.remove('border-amber-600', 'text-amber-700'); 
+        el.classList.add('border-transparent', 'text-slate-500');
+      });
+      const pane = document.getElementById('size-pane-' + tab);
+      const btn = document.getElementById('tab-btn-' + tab);
+      if (pane) pane.classList.remove('hidden');
+      if (btn) { 
+        btn.classList.add('border-amber-600', 'text-amber-700'); 
+        btn.classList.remove('border-transparent', 'text-slate-500'); 
+      }
+    }
+
+    function openModal(id) { 
+      const el = document.getElementById(id); 
+      if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }
+    }
+    function closeModal(id) { 
+      const el = document.getElementById(id); 
+      if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+    }
+
+    // Status Badges (in English)
+    function getStatusBadge(status) {
+      const s = normalizeStatus(status);
+      if (s === 'in_progress') {
+        return `<span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>In Progress</span>`;
+      }
+      if (s === 'completed') {
+        return `<span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Completed</span>`;
+      }
+      if (s === 'picked_up') {
+        return `<span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-purple-600"></span>Picked Up</span>`;
+      }
+      return `<span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 uppercase tracking-wider"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Received</span>`;
+    }
+
+    // Customer Card & Full Order History
+    function openCustomerCard(customerId) {
+      const cust = customers.find(c => c.id === customerId);
+      if (!cust) return;
+
+      document.getElementById('card-cust-name').innerText = cust.name;
+      document.getElementById('card-cust-phone').innerText = cust.phone || '-';
+
+      const btnWa = document.getElementById('card-btn-wa');
+      let cleanPhone = (cust.phone || '').replace(/\D/g, '');
+      if (cleanPhone.startsWith('0')) cleanPhone = '62' + cleanPhone.slice(1);
+      btnWa.onclick = () => window.open(`https://wa.me/${cleanPhone}`, '_blank');
+
+      const btnNewOrder = document.getElementById('card-btn-new-order');
+      btnNewOrder.onclick = () => {
+        closeModal('modal-customer-card');
+        openOrderModal(null, cust.id);
+      };
+
+      const btnEditSize = document.getElementById('card-btn-edit-size');
+      btnEditSize.onclick = () => {
+        closeModal('modal-customer-card');
+        openCustomerModal(cust.id);
+      };
+
+      const p = sizePants.find(x => x.customerId === cust.id) || {};
+      const s = sizeShirts.find(x => x.customerId === cust.id) || {};
+      const sk = sizeSkirts.find(x => x.customerId === cust.id) || {};
+      const o = sizeOthers.find(x => x.customerId === cust.id) || {};
+
+      const unit = appConfig.sizeUnit || 'cm';
+      const sizeContainer = document.getElementById('card-size-summary');
+      sizeContainer.innerHTML = '';
+
+      let hasPants = p.waist || p.length;
+      let hasShirt = s.lingkarDada || s.panjangBaju;
+      let hasSkirt = sk.lingkarPinggang || sk.panjangRok;
+      let hasOthers = o.namaBarang || o.dimensi;
+
+      if (hasPants) {
+        sizeContainer.innerHTML += `
+          <div class="bg-white p-2 rounded-lg border border-amber-200">
+            <span class="font-bold text-amber-800 block mb-0.5">👖 Trousers (${unit}):</span>
+            <span>W:${p.waist||'-'} | FR:${p.frontRise||'-'} | BR:${p.backRise||'-'} | Hip:${p.hip||'-'} | Thigh:${p.thigh||'-'} | Knee:${p.knee||'-'} | Inseam:${p.inseam||'-'} | L:${p.length||'-'}</span>
+            ${p.notes ? `<div class="text-[10px] text-slate-500 italic mt-0.5">Notes: ${p.notes}</div>` : ''}
+          </div>
+        `;
+      }
+      if (hasShirt) {
+        sizeContainer.innerHTML += `
+          <div class="bg-white p-2 rounded-lg border border-amber-200">
+            <span class="font-bold text-amber-800 block mb-0.5">👔 Shirts / Tops (${unit}):</span>
+            <span>Chest:${s.lingkarDada||'-'} | Shoulder:${s.lebarBahu||'-'} | Length:${s.panjangBaju||'-'} | Sleeve:${s.panjangLengan||'-'} | Belly:${s.lingkarPerut||'-'}</span>
+            ${s.catatan ? `<div class="text-[10px] text-slate-500 italic mt-0.5">Notes: ${s.catatan}</div>` : ''}
+          </div>
+        `;
+      }
+      if (hasSkirt) {
+        sizeContainer.innerHTML += `
+          <div class="bg-white p-2 rounded-lg border border-amber-200">
+            <span class="font-bold text-amber-800 block mb-0.5">👗 Skirts (${unit}):</span>
+            <span>Waist:${sk.lingkarPinggang||'-'} | Hip:${sk.lingkarPinggul||'-'} | Length:${sk.panjangRok||'-'} | Hem:${sk.lebarBawah||'-'}</span>
+            ${sk.catatan ? `<div class="text-[10px] text-slate-500 italic mt-0.5">Notes: ${sk.catatan}</div>` : ''}
+          </div>
+        `;
+      }
+      if (hasOthers) {
+        sizeContainer.innerHTML += `
+          <div class="bg-white p-2 rounded-lg border border-amber-200">
+            <span class="font-bold text-amber-800 block mb-0.5">✂️ Custom / Accessories:</span>
+            <span>Item: ${o.namaBarang||'-'} | Dimensions: ${o.dimensi||'-'}</span>
+            ${o.catatan ? `<div class="text-[10px] text-slate-500 italic mt-0.5">${o.catatan}</div>` : ''}
+          </div>
+        `;
+      }
+
+      if (!hasPants && !hasShirt && !hasSkirt && !hasOthers) {
+        sizeContainer.innerHTML = `<span class="text-slate-400 italic text-[11px] col-span-2">No measurement data recorded yet. Click "Edit Measurements" to add.</span>`;
+      }
+
+      const custOrders = orders.filter(ord => ord.customerId === cust.id);
+      let totalSpent = 0, totalRem = 0, activeCount = 0;
+
+      custOrders.forEach(ord => {
+        totalSpent += Number(ord.total) || 0;
+        totalRem += Number(ord.remaining) || 0;
+        const sNorm = normalizeStatus(ord.status);
+        if (sNorm === 'received' || sNorm === 'in_progress') activeCount++;
+      });
+
+      document.getElementById('card-total-order').innerText = `${custOrders.length} Orders`;
+      document.getElementById('card-active-order').innerText = `${activeCount} Active`;
+      document.getElementById('card-total-spent').innerText = formatCurrency(totalSpent);
+      document.getElementById('card-total-remaining').innerText = formatCurrency(totalRem);
+
+      const ordersContainer = document.getElementById('card-orders-container');
+      ordersContainer.innerHTML = '';
+
+      if (custOrders.length === 0) {
+        ordersContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs bg-slate-50 border rounded-xl">No past orders found for this customer.</div>`;
+      } else {
+        custOrders.slice().reverse().forEach(ord => {
+          const isLate = checkIsLate(ord);
+          const isSettled = Number(ord.remaining) <= 0;
+          const itemsDetail = (ord.items || []).map(it => `
+            <div class="text-[11px] flex justify-between py-0.5 border-b border-slate-100 last:border-none">
+              <span><b>[${(it.type||'custom').toUpperCase()}]</b> ${it.material || '-'} ${it.desc ? `<small class="text-slate-400">(${it.desc})</small>` : ''}</span>
+              <span class="font-semibold">${formatCurrency(it.price)}</span>
+            </div>
+          `).join('');
+
+          ordersContainer.innerHTML += `
+            <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-sm text-xs hover:border-slate-300 transition">
+              <div class="flex justify-between items-center pb-1.5 mb-1.5 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-slate-800">${ord.id}</span>
+                  <span class="text-[10px] text-slate-400">${cleanDateStr(ord.dateIn)} → Due: <b class="${isLate?'text-rose-600':''}">${cleanDateStr(ord.dateDue)}</b></span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  ${isLate ? '<span class="bg-rose-100 text-rose-800 text-[9px] font-bold px-1.5 py-0.5 rounded animate-pulse">OVERDUE</span>' : ''}
+                  ${getStatusBadge(ord.status)}
+                </div>
+              </div>
+              <div class="space-y-1 my-1 bg-slate-50/70 p-2 rounded-lg">${itemsDetail}</div>
+              <div class="flex justify-between items-center pt-1.5 text-[11px]">
+                <div>
+                  <span class="text-slate-400">Total:</span> <b>${formatCurrency(ord.total)}</b> 
+                  <span class="text-slate-400 ml-1.5">Paid:</span> <span class="text-emerald-600 font-semibold">${formatCurrency(ord.dp)}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-400">Due:</span>
+                  <span class="font-bold ${isSettled ? 'text-emerald-600' : 'text-rose-600'}">${isSettled ? 'PAID' : formatCurrency(ord.remaining)}</span>
+                  <button onclick="closeModal('modal-customer-card'); openOrderModal('${ord.id}')" class="text-amber-600 hover:bg-amber-50 p-1 rounded transition" title="Edit Order"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+                  <button onclick="printOrderReceipt('${ord.id}')" class="text-slate-500 hover:bg-slate-100 p-1 rounded transition" title="Print Receipt"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      openModal('modal-customer-card');
+      lucide.createIcons();
+    }
+
+    // Load & Save Store Settings
+    function loadConfigUI() {
+      document.querySelectorAll('.app-title-display').forEach(el => el.innerText = appConfig.storeName || "BRKH DENIM");
+      const cName = document.getElementById('conf-name'); if (cName) cName.value = appConfig.storeName || "";
+      const cTag = document.getElementById('conf-tagline'); if (cTag) cTag.value = appConfig.tagline || "";
+      const cAddr = document.getElementById('conf-address'); if (cAddr) cAddr.value = appConfig.address || "";
+      const cPhn = document.getElementById('conf-phone'); if (cPhn) cPhn.value = appConfig.phone || "";
+      const cSoc = document.getElementById('conf-socmed'); if (cSoc) cSoc.value = appConfig.socialMedia || "";
+      const cCap = document.getElementById('conf-capacity'); if (cCap) cCap.value = appConfig.dailyCapacity || 20;
+      const cUrl = document.getElementById('conf-script-url'); if (cUrl) cUrl.value = appConfig.scriptUrl || "";
+      
+      const cCurr = document.getElementById('conf-currency'); if (cCurr) cCurr.value = appConfig.currency || "IDR";
+      const cUnit = document.getElementById('conf-size-unit'); if (cUnit) cUnit.value = appConfig.sizeUnit || "cm";
+      const cFmt = document.getElementById('conf-receipt-format'); if (cFmt) cFmt.value = appConfig.receiptFormat || "a5";
+
+      document.querySelectorAll('.size-unit-badge').forEach(el => el.innerText = `(${appConfig.sizeUnit || 'cm'})`);
+
+      currentLogoBase64 = appConfig.logo || "";
+      updateLogoPreviews(currentLogoBase64);
+    }
+
+    function updateLogoPreviews(base64) {
+      const lPrev = document.getElementById('logo-preview');
+      const lPlaceholder = document.getElementById('logo-placeholder');
+      const btnRemove = document.getElementById('btn-remove-logo');
+      const headerMobile = document.getElementById('header-logo-mobile');
+      const headerDesktop = document.getElementById('header-logo-desktop');
+
+      if (base64 && base64.trim() !== "") {
+        if (lPrev) { lPrev.src = base64; lPrev.classList.remove('hidden'); }
+        if (lPlaceholder) lPlaceholder.classList.add('hidden');
+        if (btnRemove) btnRemove.classList.remove('hidden');
+
+        if (headerMobile) { headerMobile.src = base64; headerMobile.classList.remove('hidden'); }
+        if (headerDesktop) { headerDesktop.src = base64; headerDesktop.classList.remove('hidden'); }
+      } else {
+        if (lPrev) { lPrev.src = ""; lPrev.classList.add('hidden'); }
+        if (lPlaceholder) lPlaceholder.classList.remove('hidden');
+        if (btnRemove) btnRemove.classList.add('hidden');
+
+        if (headerMobile) { headerMobile.src = ""; headerMobile.classList.add('hidden'); }
+        if (headerDesktop) { headerDesktop.src = ""; headerDesktop.classList.add('hidden'); }
+      }
+    }
+
+    function previewLogo(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast("Please choose an image file (PNG, JPG, or WEBP).", "error");
+        event.target.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 300;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          currentLogoBase64 = canvas.toDataURL('image/png', 0.9);
+          updateLogoPreviews(currentLogoBase64);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeLogo() {
+      showConfirmModal("Remove Logo?", "Are you sure you want to remove the store logo?", () => {
+        currentLogoBase64 = "";
+        const fileInput = document.getElementById('conf-logo');
+        if (fileInput) fileInput.value = "";
+        updateLogoPreviews("");
+        showToast("Store logo removed.", "info");
+      }, "Remove", true);
+    }
+
+    function saveConfig(e) {
+      e.preventDefault();
+      const newUrl = (document.getElementById('conf-script-url')?.value || "").trim();
+
+      appConfig = {
+        storeName: document.getElementById('conf-name').value.trim() || "BRKH DENIM",
+        tagline: document.getElementById('conf-tagline').value.trim(),
+        address: document.getElementById('conf-address').value.trim(),
+        phone: document.getElementById('conf-phone').value.trim(),
+        socialMedia: document.getElementById('conf-socmed').value.trim(),
+        dailyCapacity: Number(document.getElementById('conf-capacity').value) || 20,
+        scriptUrl: newUrl,
+        logo: currentLogoBase64 || "",
+        currency: document.getElementById('conf-currency').value || "IDR",
+        sizeUnit: document.getElementById('conf-size-unit').value || "cm",
+        receiptFormat: document.getElementById('conf-receipt-format').value || "a5"
+      };
+      
+      saveData();
+      showToast("Store settings saved successfully!", "success");
+      loadConfigUI();
+
+      if (newUrl) {
+        syncDataFromCloud();
+      } else {
+        updateSyncUI("Local");
+      }
+    }
+
+    // JSON Database Backup & Restore
+    function downloadBackupJson() {
+      const backupData = {
+        appName: "BRKH DENIM Workshop App",
+        version: "2.1",
+        language: "en",
+        exportDate: new Date().toISOString(),
+        appConfig: appConfig,
+        customers: customers,
+        orders: orders,
+        cashflow: cashflow,
+        sizePants: sizePants,
+        sizeShirts: sizeShirts,
+        sizeSkirts: sizeSkirts,
+        sizeOthers: sizeOthers
+      };
+      const jsonStr = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const d = new Date();
+      const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+      a.href = url;
+      a.download = `backup_workshop_brkh_${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("Backup JSON file downloaded successfully!", "success");
+    }
+
+    function triggerRestoreJson() {
+      const input = document.getElementById('input-restore-json');
+      if (input) input.click();
+    }
+
+    function handleRestoreFile(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (!file.name.endsWith('.json')) {
+        showToast("Please choose a valid .json file.", "error");
+        e.target.value = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (!data || typeof data !== 'object') {
+            throw new Error("Invalid JSON backup structure.");
+          }
+          showConfirmModal(
+            "Restore Database Backup?",
+            `This backup file contains: ${(data.customers||[]).length} customers, ${(data.orders||[]).length} orders, and ${(data.cashflow||[]).length} cashbook entries. Current database records will be replaced. Proceed?`,
+            () => {
+              if (Array.isArray(data.customers)) customers = data.customers;
+              if (Array.isArray(data.orders)) orders = data.orders.map(o => ({ 
+                ...o, 
+                status: normalizeStatus(o.status),
+                dateIn: cleanDateStr(o.dateIn), 
+                dateDue: cleanDateStr(o.dateDue) 
+              }));
+              if (Array.isArray(data.cashflow)) cashflow = data.cashflow.map(c => ({ ...c, date: cleanDateStr(c.date) }));
+              if (Array.isArray(data.sizePants)) sizePants = data.sizePants;
+              if (Array.isArray(data.sizeShirts)) sizeShirts = data.sizeShirts;
+              if (Array.isArray(data.sizeSkirts)) sizeSkirts = data.sizeSkirts;
+              if (Array.isArray(data.sizeOthers)) sizeOthers = data.sizeOthers;
+              if (data.appConfig && typeof data.appConfig === 'object') {
+                const preservedUrl = appConfig.scriptUrl;
+                appConfig = { ...appConfig, ...data.appConfig, scriptUrl: preservedUrl };
+                currentLogoBase64 = appConfig.logo || "";
+              }
+              saveData();
+              loadConfigUI();
+              refreshAll();
+              showToast("Database restored successfully!", "success");
+            },
+            "Restore Now"
+          );
+        } catch (err) {
+          console.error(err);
+          showToast("Failed reading backup file: " + err.message, "error");
+        } finally {
+          e.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Customer Database
+    function openCustomerModal(id = null) {
+      document.getElementById('form-customer').reset();
+      document.getElementById('cust-id').value = id || '';
+      document.getElementById('customer-modal-title').innerText = id ? 'Edit Customer Profile' : 'Add New Customer';
+      switchSizeTab('pants');
+      if (id) {
+        const c = customers.find(x => x.id === id);
+        if (c) {
+          document.getElementById('cust-name').value = c.name || '';
+          document.getElementById('cust-phone').value = c.phone || '';
+          const p = sizePants.find(x => x.customerId === id) || {};
+          ['waist','frontrise','backrise','hip','thigh','knee','legopening','inseam','length','notes'].forEach(k => {
+            const el = document.getElementById('p-'+k); 
+            if(el) el.value = p[k==='frontrise'?'frontRise':k==='backrise'?'backRise':k==='legopening'?'legOpening':k] || '';
+          });
+          const s = sizeShirts.find(x => x.customerId === id) || {};
+          ['lebar-bahu','lingkar-dada','panjang-baju','panjang-lengan','kerung-lengan','pergelangan','lingkar-perut','catatan'].forEach(k => {
+            const el = document.getElementById('s-'+k); 
+            if(el) el.value = s[k.replace(/-([a-z])/g, g => g[1].toUpperCase())] || '';
+          });
+          const sk = sizeSkirts.find(x => x.customerId === id) || {};
+          ['lingkar-pinggang','lingkar-pinggul','panjang-rok','lebar-bawah','catatan'].forEach(k => {
+            const el = document.getElementById('sk-'+k); 
+            if(el) el.value = sk[k.replace(/-([a-z])/g, g => g[1].toUpperCase())] || '';
+          });
+          const o = sizeOthers.find(x => x.customerId === id) || {};
+          ['nama-barang','dimensi','catatan'].forEach(k => {
+            const el = document.getElementById('o-'+k); 
+            if(el) el.value = o[k.replace(/-([a-z])/g, g => g[1].toUpperCase())] || '';
+          });
+        }
+      }
+      openModal('modal-customer');
+    }
+
+    function saveCustomer(e) {
+      e.preventDefault();
+      const id = document.getElementById('cust-id').value || 'C-' + Date.now().toString().slice(-4);
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+
+      let cleanPhone = phone.replace(/\D/g, '');
+      if (cleanPhone.startsWith('62')) cleanPhone = '0' + cleanPhone.slice(2);
+
+      const isDuplicate = customers.some(c => {
+        let existingClean = (c.phone || '').replace(/\D/g, '');
+        if (existingClean.startsWith('62')) existingClean = '0' + existingClean.slice(2);
+        return existingClean === cleanPhone && c.id !== id;
+      });
+
+      if (isDuplicate) {
+        const existingCust = customers.find(c => {
+          let existingClean = (c.phone || '').replace(/\D/g, '');
+          if (existingClean.startsWith('62')) existingClean = '0' + existingClean.slice(2);
+          return existingClean === cleanPhone;
+        });
+        showToast(`Phone number ${phone} is already registered under "${existingCust ? existingCust.name : 'Another Customer'}"!`, "error");
+        document.getElementById('cust-phone').focus();
+        return;
+      }
+
+      const custData = { id, name, phone };
+      const cIdx = customers.findIndex(x => x.id === id);
+      if (cIdx !== -1) customers[cIdx] = custData; else customers.push(custData);
+
+      const pantsData = { 
+        id: 'PNT-' + id, 
+        customerId: id, 
+        waist: document.getElementById('p-waist').value, 
+        frontRise: document.getElementById('p-frontrise').value, 
+        backRise: document.getElementById('p-backrise').value, 
+        hip: document.getElementById('p-hip').value, 
+        thigh: document.getElementById('p-thigh').value, 
+        knee: document.getElementById('p-knee').value, 
+        legOpening: document.getElementById('p-legopening').value, 
+        inseam: document.getElementById('p-inseam').value, 
+        length: document.getElementById('p-length').value, 
+        notes: document.getElementById('p-notes').value 
+      };
+      const pIdx = sizePants.findIndex(x => x.customerId === id);
+      if (pIdx !== -1) sizePants[pIdx] = pantsData; else sizePants.push(pantsData);
+
+      const shirtData = { 
+        id: 'SHR-' + id, 
+        customerId: id, 
+        lebarBahu: document.getElementById('s-lebar-bahu').value, 
+        lingkarDada: document.getElementById('s-lingkar-dada').value, 
+        panjangBaju: document.getElementById('s-panjang-baju').value, 
+        panjangLengan: document.getElementById('s-panjang-lengan').value, 
+        kerungLengan: document.getElementById('s-kerung-lengan').value, 
+        pergelangan: document.getElementById('s-pergelangan').value, 
+        lingkarPerut: document.getElementById('s-lingkar-perut').value, 
+        catatan: document.getElementById('s-catatan').value 
+      };
+      const sIdx = sizeShirts.findIndex(x => x.customerId === id);
+      if (sIdx !== -1) sizeShirts[sIdx] = shirtData; else sizeShirts.push(shirtData);
+
+      const skirtData = { 
+        id: 'SKR-' + id, 
+        customerId: id, 
+        lingkarPinggang: document.getElementById('sk-lingkar-pinggang').value, 
+        lingkarPinggul: document.getElementById('sk-lingkar-pinggul').value, 
+        panjangRok: document.getElementById('sk-panjang-rok').value, 
+        lebarBawah: document.getElementById('sk-lebar-bawah').value, 
+        catatan: document.getElementById('sk-catatan').value 
+      };
+      const skIdx = sizeSkirts.findIndex(x => x.customerId === id);
+      if (skIdx !== -1) sizeSkirts[skIdx] = skirtData; else sizeSkirts.push(skirtData);
+
+      const otherData = { 
+        id: 'OTH-' + id, 
+        customerId: id, 
+        namaBarang: document.getElementById('o-nama-barang').value, 
+        dimensi: document.getElementById('o-dimensi').value, 
+        catatan: document.getElementById('o-catatan').value 
+      };
+      const oIdx = sizeOthers.findIndex(x => x.customerId === id);
+      if (oIdx !== -1) sizeOthers[oIdx] = otherData; else sizeOthers.push(otherData);
+
+      saveData();
+      closeModal('modal-customer');
+      showToast("Customer profile saved successfully!", "success");
+    }
+
+    function createOrderForCustomer(customerId) {
+      openOrderModal(null, customerId);
+    }
+
+    function deleteCustomer(id) {
+      const c = customers.find(x => x.id === id);
+      showConfirmModal("Delete Customer?", `Are you sure you want to delete ${c ? c.name : 'this customer'}?`, () => {
+        customers = customers.filter(x => x.id !== id);
+        sizePants = sizePants.filter(x => x.customerId !== id);
+        sizeShirts = sizeShirts.filter(x => x.customerId !== id);
+        sizeSkirts = sizeSkirts.filter(x => x.customerId !== id);
+        sizeOthers = sizeOthers.filter(x => x.customerId !== id);
+        saveData();
+        showToast("Customer deleted.", "info");
+      }, "Delete", true);
+    }
+
+    function renderCustomers() {
+      const q = (document.getElementById('search-customer')?.value || '').toLowerCase();
+      const tbody = document.getElementById('customer-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      
+      const filtered = customers.filter(c => (c.name || '').toLowerCase().includes(q) || (c.phone || '').includes(q));
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400">No matching customers found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        const orderCount = orders.filter(o => o.customerId === c.id).length;
+        
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 border-b border-slate-100 transition">
+            <td class="py-3 px-3">
+              <button onclick="openCustomerCard('${c.id}')" class="font-bold text-slate-900 hover:text-copper hover:underline text-left text-xs sm:text-sm">
+                ${c.name}
+              </button>
+              <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                <i data-lucide="phone" class="w-3 h-3 text-emerald-600"></i> ${c.phone || '-'}
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <span class="inline-block bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full text-xs font-bold border border-slate-200">
+                ${orderCount} Orders
+              </span>
+            </td>
+            <td class="py-3 px-3 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="createOrderForCustomer('${c.id}')" title="Create Order for ${c.name}" class="bg-copper/10 hover:bg-copper text-copper hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition">
+                  <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Order
+                </button>
+                <button onclick="openCustomerModal('${c.id}')" title="Edit Customer Profile" class="text-amber-600 hover:bg-amber-50 p-1.5 rounded-lg transition">
+                  <i data-lucide="edit-3" class="w-4 h-4"></i>
+                </button>
+                <button onclick="deleteCustomer('${c.id}')" title="Delete Customer" class="text-slate-400 hover:text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg transition">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    // Orders Management
+    function openOrderModal(orderId = null, prefillCustomerId = null) {
+      document.getElementById('form-order').reset();
+      const selectCust = document.getElementById('order-customer');
+      selectCust.innerHTML = '<option value="">-- Select Customer --</option>';
+      customers.forEach(c => selectCust.innerHTML += `<option value="${c.id}">${c.name} (${c.phone})</option>`);
+      document.getElementById('order-items-list').innerHTML = '';
+
+      if (orderId) {
+        const o = orders.find(x => x.id === orderId);
+        if (!o) return;
+        document.getElementById('order-modal-title').innerText = `Edit Order: ${o.id}`;
+        document.getElementById('order-id').value = o.id;
+        document.getElementById('order-customer').value = o.customerId;
+        document.getElementById('order-date-in').value = cleanDateStr(o.dateIn);
+        document.getElementById('order-date-due').value = cleanDateStr(o.dateDue);
+        document.getElementById('order-status').value = normalizeStatus(o.status);
+        document.getElementById('order-dp').value = o.dp || 0;
+        if (o.items && o.items.length > 0) {
+          o.items.forEach(it => addOrderItemRow(it.type || 'custom', it.material || '', it.point || 5, it.price || 0, it.desc || ''));
+        } else {
+          addOrderItemRow();
+        }
+      } else {
+        document.getElementById('order-modal-title').innerText = 'Create New Order';
+        document.getElementById('order-id').value = '';
+        document.getElementById('order-date-in').value = new Date().toISOString().split('T')[0];
+        document.getElementById('order-status').value = 'received';
+        if (prefillCustomerId) {
+          selectCust.value = prefillCustomerId;
+        }
+        addOrderItemRow();
+      }
+      openModal('modal-order');
+    }
+
+    function addOrderItemRow(type = 'custom', material = '', point = 5, price = 0, desc = '') {
+      const container = document.getElementById('order-items-list');
+      const div = document.createElement('div');
+      div.className = 'order-item-row p-2.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative';
+      div.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div>
+            <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Type</label>
+            <select class="order-item-type w-full border rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-amber-500 font-medium">
+              <option value="custom" ${type === 'custom' ? 'selected' : ''}>Custom Garment</option>
+              <option value="repair" ${type === 'repair' ? 'selected' : ''}>Repair / Alteration</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Fabric / Material</label>
+            <input type="text" placeholder="e.g. 14oz Raw Denim" value="${material}" class="order-item-material w-full border rounded-lg px-2 py-1.5" required>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Workload Points</label>
+            <input type="number" min="0" step="any" value="${point}" oninput="calculateOrderTotal()" class="order-item-point w-full border rounded-lg px-2 py-1.5 font-bold text-amber-700" required>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Price</label>
+            <input type="number" value="${price}" oninput="calculateOrderTotal()" class="order-item-price w-full border rounded-lg px-2 py-1.5 font-bold" required>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" placeholder="Pattern instructions / special requests (optional)" value="${desc}" class="order-item-desc flex-1 border rounded-lg px-2.5 py-1 text-xs">
+          <button type="button" onclick="removeOrderItemRow(this)" class="text-rose-500 hover:bg-rose-100 p-1.5 rounded transition" title="Delete Item">
+            <i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i>
+          </button>
+        </div>
+      `;
+      container.appendChild(div);
+      lucide.createIcons();
+      calculateOrderTotal();
+    }
+
+    function removeOrderItemRow(btn) {
+      const row = btn.closest('.order-item-row');
+      if (row) {
+        row.remove();
+        calculateOrderTotal();
+        const container = document.getElementById('order-items-list');
+        if (container.children.length === 0) addOrderItemRow();
+      }
+    }
+
+    function calculateOrderTotal() {
+      let tot = 0, pts = 0;
+      document.querySelectorAll('.order-item-price').forEach(i => tot += Number(i.value) || 0);
+      document.querySelectorAll('.order-item-point').forEach(i => pts += Math.max(0, Number(i.value) || 0));
+      document.getElementById('order-total').value = tot;
+      document.getElementById('order-points-total').innerText = pts;
+      calculateBalance();
+    }
+
+    function calculateBalance() {
+      const tot = Number(document.getElementById('order-total').value) || 0;
+      const dp = Number(document.getElementById('order-dp').value) || 0;
+      document.getElementById('order-remaining').value = Math.max(0, tot - dp);
+    }
+
+    function saveOrder(e) {
+      e.preventDefault();
+      const editId = document.getElementById('order-id').value;
+      const customerId = document.getElementById('order-customer').value;
+      const customer = customers.find(c => c.id === customerId);
+
+      const items = [];
+      const typs = document.querySelectorAll('.order-item-type');
+      const mats = document.querySelectorAll('.order-item-material');
+      const pts = document.querySelectorAll('.order-item-point');
+      const prcs = document.querySelectorAll('.order-item-price');
+      const dscs = document.querySelectorAll('.order-item-desc');
+      let totalPts = 0;
+
+      for (let i = 0; i < typs.length; i++) {
+        let pt = Math.max(0, Number(pts[i].value) || 0);
+        totalPts += pt;
+        items.push({
+          type: typs[i].value,
+          material: mats[i].value,
+          point: pt,
+          price: Number(prcs[i].value) || 0,
+          desc: dscs[i].value || ''
+        });
+      }
+
+      const total = Number(document.getElementById('order-total').value) || 0;
+      const dp = Number(document.getElementById('order-dp').value) || 0;
+      const remaining = Number(document.getElementById('order-remaining').value) || 0;
+      const dateIn = cleanDateStr(document.getElementById('order-date-in').value);
+      const dateDue = cleanDateStr(document.getElementById('order-date-due').value);
+      const status = normalizeStatus(document.getElementById('order-status').value);
+
+      if (editId) {
+        const idx = orders.findIndex(o => o.id === editId);
+        if (idx !== -1) {
+          orders[idx].customerId = customerId;
+          orders[idx].customerName = customer ? customer.name : 'Unknown';
+          orders[idx].dateIn = dateIn;
+          orders[idx].dateDue = dateDue;
+          orders[idx].items = items;
+          orders[idx].totalPoints = totalPts;
+          orders[idx].total = total;
+          orders[idx].dp = dp;
+          orders[idx].remaining = remaining;
+          orders[idx].status = status;
+        }
+      } else {
+        const newOrderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+        const orderData = {
+          id: newOrderId,
+          customerId: customerId,
+          customerName: customer ? customer.name : 'Unknown',
+          dateIn: dateIn,
+          dateDue: dateDue,
+          items: items,
+          totalPoints: totalPts,
+          total: total,
+          dp: dp,
+          remaining: remaining,
+          status: status
+        };
+        orders.push(orderData);
+
+        if (dp > 0) {
+          cashflow.unshift({
+            id: Date.now(),
+            date: dateIn || cleanDateStr(new Date()),
+            type: 'in',
+            category: 'order',
+            desc: `Deposit for ${newOrderId} - ${orderData.customerName}`,
+            amount: dp
+          });
+        }
+      }
+
+      saveData();
+      closeModal('modal-order');
+      showToast("Order saved successfully!", "success");
+    }
+
+    function deleteOrder(id) {
+      showConfirmModal("Delete Order?", `Are you sure you want to delete order ${id}?`, () => {
+        orders = orders.filter(o => o.id !== id);
+        saveData();
+        showToast(`Order ${id} deleted.`, "info");
+      }, "Delete", true);
+    }
+
+    function settleOrder(id) {
+      const order = orders.find(o => o.id === id);
+      if (!order) return;
+
+      const remainingAmount = Number(order.remaining) || 0;
+      if (remainingAmount <= 0) {
+        showToast("This order is already fully paid.", "info");
+        return;
+      }
+
+      showConfirmModal(
+        "Settle Order Balance?",
+        `Settle unpaid balance for order ${order.id} (${order.customerName}) of ${formatCurrency(remainingAmount)}? The payment will be automatically recorded into the cashbook.`,
+        () => {
+          const today = cleanDateStr(new Date());
+
+          cashflow.unshift({
+            id: Date.now(),
+            date: today,
+            type: 'in',
+            category: 'order',
+            desc: `Full Payment for ${order.id} - ${order.customerName}`,
+            amount: remainingAmount
+          });
+
+          order.dp = Number(order.total) || (Number(order.dp) + remainingAmount);
+          order.remaining = 0;
+
+          saveData();
+          showToast(`Order ${order.id} has been fully settled!`, "success");
+        },
+        "Settle Now"
+      );
+    }
+
+    function updateOrderStatus(id, newStatus, callback) {
+      const order = orders.find(o => o.id === id);
+      if (!order) return;
+      const normalizedNew = normalizeStatus(newStatus);
+
+      if ((normalizedNew === 'completed' || normalizedNew === 'picked_up') && Number(order.remaining) > 0) {
+        showConfirmModal(
+          "Settle Balance Upon Completion?",
+          `Status is being changed to "${normalizedNew.replace('_',' ').toUpperCase()}". Unpaid balance is ${formatCurrency(order.remaining)}. Would you like to mark it as fully paid and record into cashbook?`,
+          () => {
+            const rem = Number(order.remaining);
+            cashflow.unshift({
+              id: Date.now(),
+              date: cleanDateStr(new Date()),
+              type: 'in',
+              category: 'order',
+              desc: `Payment for ${order.id} - ${order.customerName}`,
+              amount: rem
+            });
+            order.dp = Number(order.total);
+            order.remaining = 0;
+            order.status = normalizedNew;
+            saveData();
+            showToast(`Order ${order.id} marked as ${normalizedNew.replace('_',' ').toUpperCase()} and settled!`, "success");
+            if (typeof callback === 'function') callback();
+          },
+          "Settle & Update"
+        );
+        return;
+      }
+
+      order.status = normalizedNew;
+      saveData();
+      showToast(`Order ${order.id} status updated to: ${normalizedNew.replace('_',' ').toUpperCase()}`, "success");
+      if (typeof callback === 'function') callback();
+    }
+
+    function quickUpdateOrderStatus(id, newStatus, dateStr) {
+      updateOrderStatus(id, newStatus, () => {
+        if (dateStr) {
+          const f = orders.filter(o => cleanDateStr(o.dateDue) === dateStr);
+          let totalPts = 0;
+          f.forEach(o => (o.items || []).forEach(it => totalPts += (Number(it.point) || 5)));
+          const maxCapacity = appConfig.dailyCapacity || 20;
+          const pct = Math.round((totalPts / maxCapacity) * 100);
+          showCalendarDetails(dateStr, totalPts, pct);
+        }
+      });
+    }
+
+    function printOrderReceipt(orderId) {
+      const o = orders.find(x => x.id === orderId);
+      if (!o) return;
+      const c = customers.find(x => x.id === o.customerId) || {};
+      
+      const format = appConfig.receiptFormat || 'a5';
+      let pageStyle = '';
+      let isThermal = format === 'thermal58' || format === 'thermal80';
+
+      if (format === 'a4') {
+        pageStyle = `@page { size: A4 portrait; margin: 15mm 20mm; } body { font-family: sans-serif; font-size: 11pt; line-height: 1.5; color: #1e293b; }`;
+      } else if (format === 'thermal80') {
+        pageStyle = `@page { size: 80mm auto; margin: 4mm; } body { font-family: monospace, sans-serif; font-size: 8.5pt; line-height: 1.3; color: #000; width: 72mm; margin: 0 auto; }`;
+      } else if (format === 'thermal58') {
+        pageStyle = `@page { size: 58mm auto; margin: 3mm; } body { font-family: monospace, sans-serif; font-size: 7.5pt; line-height: 1.25; color: #000; width: 50mm; margin: 0 auto; }`;
+      } else {
+        // A5 default
+        pageStyle = `@page { size: A5 portrait; margin: 10mm 12mm; } body { font-family: sans-serif; font-size: 10pt; line-height: 1.4; color: #1e293b; }`;
+      }
+
+      const itemsHtml = (o.items || []).map((it, i) => `
+        <tr>
+          <td style="text-align: center; padding: 5px 2px;">${i+1}</td>
+          <td style="padding: 5px 4px;"><b>[${(it.type||'custom').toUpperCase()}]</b> ${it.material || '-'} ${it.desc?`<br><small style="color:#64748b;">${it.desc}</small>`:''}</td>
+          <td style="text-align: center; padding: 5px 2px;">${it.point || 5} pt</td>
+          <td style="text-align: right; padding: 5px 4px;">${formatCurrency(it.price)}</td>
+        </tr>
+      `).join('');
+      
+      const logoHtml = appConfig.logo ? `<img src="${appConfig.logo}" style="max-height: ${isThermal?'36px':'48px'}; max-width: ${isThermal?'90px':'120px'}; margin-right: 10px; object-fit: contain;">` : '';
+
+      const pr = window.open('', '_blank');
+      pr.document.write(`
+        <html><head><title>Receipt_${o.id}</title><style>
+        ${pageStyle}
+        .header { border-bottom: 2px ${isThermal?'dashed':'solid'} #1a2536; padding-bottom: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        table { width: 100%; border-collapse: collapse; } th { background-color: #1a2536; color: white; padding: 5px 4px; text-align: left; }
+        td { border-bottom: 1px ${isThermal?'dashed':'solid'} #e2e8f0; } .tot td { border: none; padding: 3px 0; }
+        .badge-status { background: #1a2536; color: white; font-size: 8pt; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+        </style></head><body>
+          <div class="header">
+            <div style="display: flex; align-items: center;">
+              ${logoHtml}
+              <div>
+                <h1 style="margin:0; font-size:${isThermal?'13pt':'16pt'}; color:#111a26;">${appConfig.storeName}</h1>
+                <div style="font-size:7.5pt; color:#64748b;">${appConfig.tagline}</div>
+              </div>
+            </div>
+            <div class="badge-status">ORDER INVOICE</div>
+          </div>
+          <table>
+            <tr>
+              <td style="width:50%; border:none; vertical-align:top; font-size:8.5pt;">
+                <b>Order No:</b> ${o.id}<br>
+                <b>Date In:</b> ${cleanDateStr(o.dateIn)}<br>
+                <b>Target Due:</b> ${cleanDateStr(o.dateDue)}<br>
+                <b>Status:</b> ${normalizeStatus(o.status).replace('_',' ').toUpperCase()}
+              </td>
+              <td style="width:50%; text-align:right; border:none; vertical-align:top; font-size:8.5pt;">
+                <b>Customer:</b> ${o.customerName}<br>
+                <b>Phone:</b> ${c.phone||'-'}<br>
+                <b>Address:</b> ${appConfig.address}
+              </td>
+            </tr>
+          </table>
+          <br>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:20px; text-align:center;">No</th>
+                <th>Item & Fabric</th>
+                <th style="width:50px; text-align:center;">Points</th>
+                <th style="width:95px; text-align:right;">Price</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>
+          <br>
+          <table class="tot">
+            <tr><td style="text-align:right; font-size:9pt;">Total Amount:</td><td style="text-align:right; font-weight:bold; width:110px;">${formatCurrency(o.total)}</td></tr>
+            <tr><td style="text-align:right; font-size:9pt;">Deposit Paid:</td><td style="text-align:right; font-weight:bold; color:green; width:110px;">${formatCurrency(o.dp)}</td></tr>
+            <tr><td style="text-align:right; font-weight:bold; border-top:1px solid #ccc; font-size:9pt;">Balance Due:</td><td style="text-align:right; font-weight:900; border-top:1px solid #ccc; color:${o.remaining>0?'red':'green'}; width:110px;">${o.remaining>0?formatCurrency(o.remaining):'PAID IN FULL'}</td></tr>
+          </table>
+          <div style="margin-top:16px; font-size:8pt; color:#666; text-align:center; border-top:1px ${isThermal?'dashed':'solid'} #ddd; padding-top:8px;">
+            Thank you for choosing ${appConfig.storeName}!<br>
+            Phone: ${appConfig.phone} | ${appConfig.socialMedia}
+          </div>
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body></html>`);
+      pr.document.close();
+    }
+
+    function sendWhatsAppReceipt(orderId) {
+      const o = orders.find(x => x.id === orderId);
+      if (!o) return;
+      const c = customers.find(x => x.id === o.customerId) || {};
+      let phone = (c.phone || '').replace(/\D/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+      
+      const itemsList = (o.items || []).map(it => `• [${(it.type||'custom').toUpperCase()}] ${it.material} (Pt: ${it.point||5}) - ${formatCurrency(it.price)}`).join('\n');
+      const text = `Hello *${o.customerName}*,\nHere is your order summary from *${appConfig.storeName}*:\n\n*Order No:* ${o.id}\n*Target Due Date:* ${cleanDateStr(o.dateDue)}\n*Status:* ${normalizeStatus(o.status).replace('_',' ').toUpperCase()}\n\n*Order Items:*\n${itemsList}\n\n*Total Price:* ${formatCurrency(o.total)}\n*Deposit Paid:* ${formatCurrency(o.dp)}\n*Balance Due:* ${o.remaining>0?formatCurrency(o.remaining):'PAID IN FULL'}\n\nThank you! 🙏`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function renderOrders() {
+      const tbody = document.getElementById('orders-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      
+      if (orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400">No orders recorded yet.</td></tr>`;
+        return;
+      }
+
+      orders.slice().reverse().forEach(o => {
+        const itemsDetail = (o.items || []).map(it => `
+          <div class="mb-0.5">
+            <span class="font-bold text-[9px] px-1 rounded ${it.type === 'repair' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-800'}">${(it.type||'custom').toUpperCase()}</span> ${it.material || '-'}
+          </div>
+        `).join('');
+        
+        const isSettled = Number(o.remaining) <= 0;
+        const isLate = checkIsLate(o);
+        
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 border-b border-slate-100 ${isLate ? 'bg-rose-50/40' : ''} transition">
+            <td class="py-2.5 px-3 font-semibold">${o.id}<br><span class="text-[10px] text-slate-400 font-normal">${cleanDateStr(o.dateIn)}</span></td>
+            <td class="py-2.5 px-3 font-medium">
+              <button onclick="openCustomerCard('${o.customerId}')" class="font-bold text-slate-800 hover:text-copper hover:underline text-left">
+                ${o.customerName}
+              </button>
+            </td>
+            <td class="py-2.5 px-3 text-[10px]">${itemsDetail}</td>
+            <td class="py-2.5 px-3 text-center"><span class="bg-amber-50 text-amber-800 border px-2 py-0.5 rounded-full text-[10px] font-black">${o.totalPoints || 0} Pts</span></td>
+            <td class="py-2.5 px-3 text-[11px]"><b>${formatCurrency(o.total)}</b><br><span class="text-emerald-600 text-[10px]">Paid: ${formatCurrency(o.dp)}</span></td>
+            <td class="py-2.5 px-3 text-[11px]">
+              <span class="font-bold ${isSettled ? 'text-emerald-600' : 'text-rose-600'}">${formatCurrency(o.remaining)}</span>
+              ${!isSettled ? `
+                <button onclick="settleOrder('${o.id}')" title="Click to Settle Balance" class="block mt-1 text-[9px] bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded border border-emerald-300 font-bold transition">
+                  ✓ Settle
+                </button>
+              ` : '<span class="block text-[9px] text-emerald-600 font-bold mt-0.5">Paid</span>'}
+            </td>
+            <td class="py-2.5 px-3 text-[10px]">
+              <span class="${isLate ? 'font-black text-rose-600' : 'text-slate-600'}">${cleanDateStr(o.dateDue)}</span>
+              ${isLate ? '<span class="block text-[8px] font-bold text-rose-600">OVERDUE</span>' : ''}
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              ${getStatusBadge(o.status)}
+            </td>
+            <td class="py-2.5 px-3 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button onclick="printOrderReceipt('${o.id}')" class="p-1 hover:bg-slate-100 rounded text-slate-700 transition" title="Print Receipt"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+                <button onclick="sendWhatsAppReceipt('${o.id}')" class="p-1 hover:bg-emerald-50 rounded text-emerald-600 transition" title="Send WhatsApp Receipt"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i></button>
+                <button onclick="openOrderModal('${o.id}')" class="p-1 hover:bg-amber-50 rounded text-amber-600 transition" title="Edit Order"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+                <button onclick="deleteOrder('${o.id}')" class="p-1 hover:bg-rose-50 rounded text-rose-400 transition" title="Delete Order"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    // Schedule & Calendar
+    function changeCalendarMonth(offset) {
+      calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + offset);
+      renderCalendar();
+    }
+
+    function goToCurrentMonth() {
+      calendarCurrentDate = new Date();
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendar-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      
+      const year = calendarCurrentDate.getFullYear(), month = calendarCurrentDate.getMonth();
+      const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
+      document.getElementById('calendar-header-title').innerText = `Deadline Calendar - ${calendarCurrentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+      
+      const todayStr = cleanDateStr(new Date());
+      const maxCapacity = appConfig.dailyCapacity || 20;
+
+      for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="min-h-[58px] bg-slate-50/40 rounded-lg"></div>`;
+      
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const dayOrders = orders.filter(o => cleanDateStr(o.dateDue) === dateStr);
+        let totalPts = 0;
+        dayOrders.forEach(o => (o.items || []).forEach(it => totalPts += (Number(it.point) || 5)));
+        const percent = Math.round((totalPts / maxCapacity) * 100);
+        
+        let bc = 'bg-emerald-600 text-white';
+        if (percent >= 100) bc = 'bg-rose-600 text-white animate-pulse';
+        else if (percent >= 70) bc = 'bg-orange-500 text-white';
+
+        const isSelected = selectedCalendarDateStr === dateStr;
+        
+        grid.innerHTML += `
+          <button onclick="showCalendarDetails('${dateStr}', ${totalPts}, ${percent})" class="min-h-[58px] p-1 border rounded-lg flex flex-col justify-between text-left transition transform active:scale-95 ${dateStr === todayStr ? 'ring-2 ring-amber-500 bg-amber-50/70 font-bold' : isSelected ? 'ring-2 ring-indigo-500 bg-indigo-50' : 'bg-white'} ${dayOrders.length > 0 ? (percent >= 100 ? 'bg-rose-50 border-rose-300' : 'bg-amber-50/40 border-amber-200') : 'border-slate-200 hover:border-slate-300'}">
+            <div class="flex justify-between w-full px-0.5">
+              <span class="text-[11px] font-semibold ${dateStr === todayStr ? 'text-amber-700 font-black' : 'text-slate-700'}">${d}</span>
+            </div>
+            ${dayOrders.length > 0 ? `
+              <div class="w-full text-center mt-0.5">
+                <span class="block text-[9px] font-bold text-slate-800">${dayOrders.length} Ord</span>
+                <span class="inline-block text-[9px] px-1.5 rounded-full ${bc}">${percent}%</span>
+              </div>
+            ` : '<div class="h-4"></div>'}
+          </button>
+        `;
+      }
+    }
+
+    // POINT 1: SCHEDULE ORDER CARD UNDER CALENDAR - REMOVED PENCIL AND PRINT BUTTONS (STATUS DROPDOWN ONLY)
+    function showCalendarDetails(dateStr, pts, percent) {
+      selectedCalendarDateStr = dateStr;
+      const el = document.getElementById('calendar-selected-details');
+      if (!el) return;
+      el.classList.remove('hidden');
+
+      const maxCapacity = appConfig.dailyCapacity || 20;
+      const dayOrders = orders.filter(o => cleanDateStr(o.dateDue) === dateStr);
+
+      const dObj = new Date(dateStr + 'T00:00:00');
+      const dateFormatted = !isNaN(dObj.getTime()) 
+        ? dObj.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+        : dateStr;
+
+      if (!dayOrders.length) {
+        el.innerHTML = `
+          <div class="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center">
+            <span class="font-bold text-slate-700 text-xs">${dateFormatted}</span>
+            <p class="text-slate-400 text-[11px] mt-1">No orders scheduled for this date.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const ordersListHtml = dayOrders.map(o => {
+        const isLate = checkIsLate(o);
+        const isSettled = Number(o.remaining) <= 0;
+        const itemsSummary = (o.items || []).map(i => `[${(i.type||'custom').toUpperCase()}] ${i.material || '-'}`).join(', ');
+        const st = normalizeStatus(o.status);
+
+        return `
+          <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="font-black text-slate-900">${o.id}</span>
+                <button onclick="openCustomerCard('${o.customerId}')" class="font-bold text-copper hover:underline text-xs">
+                  ${o.customerName}
+                </button>
+                ${isLate ? '<span class="bg-rose-100 text-rose-700 text-[9px] font-bold px-1.5 py-0.5 rounded">OVERDUE</span>' : ''}
+              </div>
+              <div class="text-[11px] text-slate-500">${itemsSummary} - <b class="text-amber-800">${o.totalPoints||0} Points</b></div>
+              <div class="text-[11px]">
+                <span class="text-slate-400">Total:</span> <b>${formatCurrency(o.total)}</b> | 
+                <span class="text-slate-400">Due:</span> <b class="${isSettled?'text-emerald-600':'text-rose-600'}">${isSettled?'PAID':formatCurrency(o.remaining)}</b>
+              </div>
+            </div>
+
+            <!-- QUICK STATUS EDIT DROPDOWN ONLY (EDIT PENCIL & PRINT ICONS REMOVED PER USER REQUEST) -->
+            <div class="flex items-center shrink-0 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+              <div class="flex flex-col">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Quick Status Edit</span>
+                <select onchange="quickUpdateOrderStatus('${o.id}', this.value, '${dateStr}')" class="text-xs font-semibold rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 mt-0.5 focus:ring-2 focus:ring-amber-500 shadow-sm cursor-pointer">
+                  <option value="received" ${st==='received'?'selected':''}>Received</option>
+                  <option value="in_progress" ${st==='in_progress'?'selected':''}>In Progress</option>
+                  <option value="completed" ${st==='completed'?'selected':''}>Completed</option>
+                  <option value="picked_up" ${st==='picked_up'?'selected':''}>Picked Up</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      el.innerHTML = `
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+          <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-200 pb-2">
+            <div>
+              <span class="text-xs font-bold text-slate-900">${dateFormatted}</span>
+              <span class="text-[11px] text-slate-500 block">Total Workload: <b class="text-amber-800">${pts} / ${maxCapacity} Points (${percent}%)</b></span>
+            </div>
+            <span class="text-[10px] bg-white border border-slate-200 px-2 py-1 rounded-md text-slate-600 font-semibold">
+              ${dayOrders.length} Scheduled Orders
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            ${ordersListHtml}
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function renderSchedule() { 
+      renderCalendar(); 
+    }
+
+    // Cashbook & Ledgers
+    function updateCategoryOptions() {
+      const type = document.getElementById('cash-type').value;
+      const selectCat = document.getElementById('cash-category');
+      if (!selectCat) return;
+      selectCat.innerHTML = '';
+      const list = CASH_CATEGORIES[type] || [];
+      list.forEach(item => {
+        selectCat.innerHTML += `<option value="${item.value}">${item.label}</option>`;
+      });
+    }
+
+    function openCashModal() {
+      document.getElementById('form-cash').reset();
+      document.getElementById('cash-date').value = new Date().toISOString().split('T')[0];
+      updateCategoryOptions();
+      openModal('modal-cash');
+    }
+
+    function saveCashflow(e) {
+      e.preventDefault();
+      cashflow.unshift({
+        id: Date.now(),
+        date: cleanDateStr(document.getElementById('cash-date').value),
+        type: document.getElementById('cash-type').value,
+        category: document.getElementById('cash-category').value,
+        desc: document.getElementById('cash-desc').value,
+        amount: Number(document.getElementById('cash-amount').value)
+      });
+      saveData();
+      closeModal('modal-cash');
+      showToast("Cash entry recorded successfully!", "success");
+    }
+
+    function deleteCash(id) {
+      showConfirmModal("Delete Cash Entry?", "Are you sure you want to delete this cash entry?", () => {
+        cashflow = cashflow.filter(c => c.id !== id);
+        saveData();
+        showToast("Cash entry deleted.", "info");
+      }, "Delete", true);
+    }
+
+    function getCategoryBadge(cat, type) {
+      if (!cat) return `<span class="text-[10px] text-slate-400 italic">-</span>`;
+      const c = String(cat).toLowerCase();
+      
+      let label = cat;
+      let color = 'bg-slate-100 text-slate-700 border-slate-200';
+
+      if (c === 'order') {
+        label = 'Order Payment';
+        color = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      } else if (c === 'other_income' || c === 'pendapatan lain2') {
+        label = 'Other Income';
+        color = 'bg-teal-100 text-teal-800 border-teal-200';
+      } else if (c === 'tools_materials' || c === 'alat dan bahan') {
+        label = 'Tools & Materials';
+        color = 'bg-amber-100 text-amber-800 border-amber-200';
+      } else if (c === 'operational' || c === 'operasional') {
+        label = 'Operational';
+        color = 'bg-indigo-100 text-indigo-800 border-indigo-200';
+      } else if (c === 'meals' || c === 'makan minum') {
+        label = 'Meals & Snacks';
+        color = 'bg-orange-100 text-orange-800 border-orange-200';
+      } else if (c === 'salary' || c === 'gaji') {
+        label = 'Salaries';
+        color = 'bg-purple-100 text-purple-800 border-purple-200';
+      } else if (c === 'other_expense' || c === 'lain2') {
+        label = 'Other Expense';
+        color = 'bg-slate-100 text-slate-700 border-slate-200';
+      }
+
+      return `<span class="text-[9px] font-semibold px-2 py-0.5 rounded-full border ${color} uppercase tracking-wider">${label}</span>`;
+    }
+
+    function changeCashCategoryMonth(offset) {
+      cashCategoryMonthDate.setMonth(cashCategoryMonthDate.getMonth() + offset);
+      renderCashCategoryChart();
+    }
+
+    function setCashAnalyticsView(type) {
+      cashAnalyticsActiveType = type;
+      const btnOut = document.getElementById('btn-cash-view-out');
+      const btnIn = document.getElementById('btn-cash-view-in');
+      
+      if (type === 'out') {
+        btnOut.className = "px-2.5 py-1 rounded-md bg-white text-rose-600 shadow-sm transition font-bold";
+        btnIn.className = "px-2.5 py-1 rounded-md text-slate-600 hover:text-emerald-700 transition font-semibold";
+      } else {
+        btnIn.className = "px-2.5 py-1 rounded-md bg-white text-emerald-700 shadow-sm transition font-bold";
+        btnOut.className = "px-2.5 py-1 rounded-md text-slate-600 hover:text-rose-600 transition font-semibold";
+      }
+      renderCashCategoryChart();
+    }
+
+    function renderCashCategoryChart() {
+      const year = cashCategoryMonthDate.getFullYear();
+      const month = cashCategoryMonthDate.getMonth();
+      const lbl = document.getElementById('cash-category-month-label');
+      if (lbl) {
+        lbl.innerText = cashCategoryMonthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      }
+
+      const container = document.getElementById('cash-category-chart-container');
+      if (!container) return;
+
+      const targetType = cashAnalyticsActiveType;
+      const categoriesConfig = CASH_CATEGORIES[targetType] || [];
+
+      const monthlyItems = cashflow.filter(c => {
+        if (c.type !== targetType) return false;
+        const ds = cleanDateStr(c.date);
+        if (!ds) return false;
+        const parts = ds.split('-');
+        if (parts.length >= 2) {
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          return y === year && m === month;
+        }
+        return false;
+      });
+
+      let categoryTotals = {};
+      categoriesConfig.forEach(cat => { categoryTotals[cat.value] = 0; });
+
+      let grandTotal = 0;
+      monthlyItems.forEach(item => {
+        const amt = Number(item.amount) || 0;
+        let cKey = (item.category || '').toLowerCase();
+        
+        // map legacy Indonesian keys
+        if (cKey === 'pendapatan lain2') cKey = 'other_income';
+        if (cKey === 'alat dan bahan') cKey = 'tools_materials';
+        if (cKey === 'operasional') cKey = 'operational';
+        if (cKey === 'makan minum') cKey = 'meals';
+        if (cKey === 'gaji') cKey = 'salary';
+        if (cKey === 'lain2') cKey = 'other_expense';
+
+        if (!categoryTotals.hasOwnProperty(cKey)) {
+          cKey = targetType === 'in' ? 'other_income' : 'other_expense';
+        }
+        categoryTotals[cKey] = (categoryTotals[cKey] || 0) + amt;
+        grandTotal += amt;
+      });
+
+      if (grandTotal === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-400 text-xs w-full bg-slate-50/70 border border-dashed border-slate-200 rounded-xl">
+            <i data-lucide="inbox" class="w-7 h-7 mx-auto mb-1.5 opacity-40"></i>
+            No ${targetType === 'in' ? 'income' : 'expense'} transactions recorded in ${lbl.innerText}.
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      let cumulativePercent = 0;
+      const svgSegments = categoriesConfig.map(cat => {
+        const val = categoryTotals[cat.value] || 0;
+        if (val === 0) return '';
+        const pct = (val / grandTotal) * 100;
+        const offset = -cumulativePercent;
+        cumulativePercent += pct;
+        return `<circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="${cat.color}" stroke-width="5" stroke-dasharray="${pct.toFixed(2)} ${(100 - pct).toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"></circle>`;
+      }).join('');
+
+      const barsHtml = categoriesConfig.map(cat => {
+        const val = categoryTotals[cat.value] || 0;
+        const pct = grandTotal > 0 ? Math.round((val / grandTotal) * 100) : 0;
+        return `
+          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 transition">
+            <div class="flex justify-between items-center text-xs mb-1">
+              <span class="flex items-center gap-2 font-bold text-slate-700">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${cat.color}"></span>
+                ${cat.label}
+              </span>
+              <div class="text-right">
+                <span class="font-black text-slate-900">${formatCurrency(val)}</span>
+                <span class="text-[10px] text-slate-400 ml-1">(${pct}%)</span>
+              </div>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+              <div class="h-1.5 rounded-full transition-all duration-300" style="width: ${pct}%; background-color: ${cat.color};"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="relative w-44 h-44 flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 42 42" class="w-full h-full -rotate-90">
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#f1f5f9" stroke-width="5"></circle>
+            ${svgSegments}
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-2">
+            <span class="text-[9px] uppercase tracking-wider font-bold text-slate-400">Total ${targetType === 'in' ? 'In' : 'Out'}</span>
+            <span class="text-xs sm:text-sm font-black ${targetType === 'in' ? 'text-emerald-700' : 'text-rose-700'} mt-0.5 truncate max-w-[130px]">${formatCurrency(grandTotal)}</span>
+            <span class="text-[8px] text-slate-400 font-medium">${lbl.innerText}</span>
+          </div>
+        </div>
+        <div class="flex-1 w-full max-w-md space-y-2">
+          ${barsHtml}
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function changeLedgerMonth(offset) {
+      ledgerMonthDate.setMonth(ledgerMonthDate.getMonth() + offset);
+      renderCashflow();
+    }
+
+    function goToCurrentLedgerMonth() {
+      ledgerMonthDate = new Date();
+      renderCashflow();
+    }
+
+    function renderCashflow() {
+      let tIn = 0, tOut = 0;
+      const todayStr = cleanDateStr(new Date());
+      let todayIn = 0, todayOut = 0;
+
+      // Overall totals & today calculation
+      cashflow.forEach(c => {
+        const amt = Number(c.amount) || 0;
+        const ds = cleanDateStr(c.date);
+        if (c.type === 'in') {
+          tIn += amt;
+          if (ds === todayStr) todayIn += amt;
+        } else {
+          tOut += amt;
+          if (ds === todayStr) todayOut += amt;
+        }
+      });
+
+      // Filter transactions strictly for the selected month
+      const targetYear = ledgerMonthDate.getFullYear();
+      const targetMonth = ledgerMonthDate.getMonth();
+      const monthLabel = ledgerMonthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      
+      const elMonthLbl = document.getElementById('ledger-month-label');
+      if (elMonthLbl) elMonthLbl.innerText = ledgerMonthDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+      let monthIn = 0, monthOut = 0;
+      const monthlyCashflow = cashflow.filter(c => {
+        const ds = cleanDateStr(c.date);
+        if (!ds) return false;
+        const parts = ds.split('-');
+        if (parts.length >= 2) {
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          const match = (y === targetYear && m === targetMonth);
+          if (match) {
+            const amt = Number(c.amount) || 0;
+            if (c.type === 'in') monthIn += amt; else monthOut += amt;
+          }
+          return match;
+        }
+        return false;
+      });
+
+      const tbody = document.getElementById('cashflow-table-body');
+      if (tbody) {
+        tbody.innerHTML = '';
+        if (monthlyCashflow.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">No cash transactions recorded in ${monthLabel}.</td></tr>`;
+        } else {
+          monthlyCashflow.forEach(c => {
+            const amt = Number(c.amount) || 0;
+            tbody.innerHTML += `
+              <tr class="hover:bg-slate-50 border-b border-slate-100 transition">
+                <td class="py-2.5 px-3 text-[10px] text-slate-500 whitespace-nowrap">${cleanDateStr(c.date)}</td>
+                <td class="py-2.5 px-3 whitespace-nowrap">${getCategoryBadge(c.category, c.type)}</td>
+                <td class="py-2.5 px-3 font-medium text-slate-800">${c.desc}</td>
+                <td class="py-2.5 px-3 whitespace-nowrap">
+                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${c.type==='in'?'bg-emerald-100 text-emerald-800':'bg-rose-100 text-rose-800'}">
+                    ${c.type==='in'?'Income':'Expense'}
+                  </span>
+                </td>
+                <td class="py-2.5 px-3 text-right font-bold text-[11px] whitespace-nowrap ${c.type==='in'?'text-emerald-600':'text-rose-600'}">
+                  ${c.type==='in'?'+':'-'} ${formatCurrency(amt)}
+                </td>
+                <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                  <button onclick="deleteCash(${c.id})" class="text-slate-400 hover:text-rose-500 p-1 transition" title="Delete Entry"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </td>
+              </tr>
+            `;
+          });
+        }
+      }
+
+      // Update Ledger Footer Summary
+      const summaryEl = document.getElementById('ledger-monthly-summary');
+      if (summaryEl) {
+        const netMonth = monthIn - monthOut;
+        summaryEl.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-700">${monthLabel}:</span>
+            <span class="text-slate-500">${monthlyCashflow.length} transaction(s)</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span>Income: <b class="text-emerald-700 font-bold">${formatCurrency(monthIn)}</b></span>
+            <span>Expense: <b class="text-rose-700 font-bold">${formatCurrency(monthOut)}</b></span>
+            <span>Net: <b class="${netMonth >= 0 ? 'text-emerald-700' : 'text-rose-700'} font-black">${(netMonth >= 0 ? '+' : '') + formatCurrency(netMonth)}</b></span>
+          </div>
+        `;
+      }
+      
+      const elTodayIn = document.getElementById('cash-today-in');
+      const elTodayOut = document.getElementById('cash-today-out');
+      const elTodayBal = document.getElementById('cash-today-balance');
+      const todayBalance = todayIn - todayOut;
+
+      if (elTodayIn) elTodayIn.innerText = formatCurrency(todayIn);
+      if (elTodayOut) elTodayOut.innerText = formatCurrency(todayOut);
+      if (elTodayBal) {
+        elTodayBal.innerText = formatCurrency(todayBalance);
+        elTodayBal.className = `text-lg sm:text-2xl font-black mt-1 truncate ${todayBalance >= 0 ? 'text-slate-900' : 'text-rose-600'}`;
+      }
+
+      const elIn = document.getElementById('cash-in-total'); if (elIn) elIn.innerText = formatCurrency(tIn);
+      const elOut = document.getElementById('cash-out-total'); if (elOut) elOut.innerText = formatCurrency(tOut);
+      const elBal = document.getElementById('cash-balance-total'); if (elBal) elBal.innerText = formatCurrency(tIn - tOut);
+      
+      renderCashCategoryChart();
+      lucide.createIcons();
+    }
+
+    // Dashboard Charts & Layout
+    function changeDashboardMonth(offset) {
+      dashChartDate.setMonth(dashChartDate.getMonth() + offset);
+      renderDashboardDailyInOutChart();
+    }
+
+    function changeDashboardYear(offset) {
+      dashYearDate.setFullYear(dashYearDate.getFullYear() + offset);
+      renderDashboardYearLineChart();
+    }
+
+    function renderDashboardPieChart() {
+      let cCust = 0, cRep = 0;
+      orders.forEach(o => {
+        (o.items || []).forEach(it => {
+          if ((it.type || '').toLowerCase() === 'repair') cRep++; else cCust++;
+        });
+      });
+
+      const tot = cCust + cRep;
+      const container = document.getElementById('dash-pie-container');
+      if (!container) return;
+
+      if (!tot) {
+        container.innerHTML = `<div class="text-center text-slate-400 py-6 text-xs w-full">No order items recorded yet.</div>`;
+        return;
+      }
+
+      const pCust = Math.round((cCust / tot) * 100);
+      const pRep = 100 - pCust;
+
+      container.innerHTML = `
+        <div class="relative w-36 h-36 flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 42 42" class="w-full h-full -rotate-90">
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#f1f5f9" stroke-width="5"></circle>
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#3b82f6" stroke-width="5" stroke-dasharray="${pRep} ${100-pRep}" stroke-dashoffset="0"></circle>
+            <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#d97736" stroke-width="5" stroke-dasharray="${pCust} ${100-pCust}" stroke-dashoffset="-${pRep}"></circle>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span class="text-xl font-black text-slate-800">${tot}</span>
+            <span class="text-[8px] font-bold text-slate-400 uppercase">Total Items</span>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2 w-full max-w-xs">
+          <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex justify-between items-center">
+            <div>
+              <span class="font-bold text-xs text-amber-900 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-copper inline-block"></span> Custom Garments
+              </span>
+              <p class="text-[10px] text-slate-500">New tailored clothes</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs sm:text-sm font-black text-amber-900">${cCust} Pcs</span>
+              <span class="text-[10px] text-amber-700 ml-1">(${pCust}%)</span>
+            </div>
+          </div>
+          <div class="p-2.5 bg-blue-50 border border-blue-200 rounded-xl flex justify-between items-center">
+            <div>
+              <span class="font-bold text-xs text-blue-900 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span> Alterations / Repairs
+              </span>
+              <p class="text-[10px] text-slate-500">Hemming, repairs, sizing</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs sm:text-sm font-black text-blue-900">${cRep} Pcs</span>
+              <span class="text-[10px] text-blue-700 ml-1">(${pRep}%)</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDashboardDailyInOutChart() {
+      const year = dashChartDate.getFullYear();
+      const month = dashChartDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      
+      const ml = document.getElementById('dash-chart-month');
+      if (ml) ml.innerText = dashChartDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+      let dailyIn = new Array(daysInMonth).fill(0);
+      let dailyOut = new Array(daysInMonth).fill(0);
+      let totalMonthIn = 0;
+      let totalMonthOut = 0;
+
+      cashflow.forEach(c => {
+        const ds = cleanDateStr(c.date);
+        if (!ds) return;
+        const [y, m, d] = ds.split('-').map(Number);
+        if (y === year && (m - 1) === month) {
+          const amt = Number(c.amount) || 0;
+          if (c.type === 'in') {
+            dailyIn[d - 1] += amt;
+            totalMonthIn += amt;
+          } else {
+            dailyOut[d - 1] += amt;
+            totalMonthOut += amt;
+          }
+        }
+      });
+
+      const netMonth = totalMonthIn - totalMonthOut;
+
+      const elIn = document.getElementById('dash-month-total-in');
+      const elOut = document.getElementById('dash-month-total-out');
+      const elNet = document.getElementById('dash-month-net-balance');
+
+      if (elIn) elIn.innerText = formatCurrency(totalMonthIn);
+      if (elOut) elOut.innerText = formatCurrency(totalMonthOut);
+      if (elNet) {
+        elNet.innerText = (netMonth >= 0 ? '+' : '') + formatCurrency(netMonth);
+        elNet.className = `text-sm sm:text-base font-black mt-0.5 truncate ${netMonth >= 0 ? 'text-emerald-700' : 'text-rose-600'}`;
+      }
+
+      const container = document.getElementById('dash-daily-inout-bars');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const maxVal = Math.max(...dailyIn, ...dailyOut, 1);
+
+      for (let i = 0; i < daysInMonth; i++) {
+        const valIn = dailyIn[i];
+        const valOut = dailyOut[i];
+        const pctIn = valIn > 0 ? Math.max(4, Math.floor((valIn / maxVal) * 100)) : 0;
+        const pctOut = valOut > 0 ? Math.max(4, Math.floor((valOut / maxVal) * 100)) : 0;
+
+        const isToday = (year === new Date().getFullYear() && month === new Date().getMonth() && (i + 1) === new Date().getDate());
+
+        let posClass = "left-1/2 -translate-x-1/2";
+        if (i < 3) posClass = "left-0";
+        else if (i > daysInMonth - 4) posClass = "right-0";
+
+        container.innerHTML += `
+          <div class="flex-1 flex flex-col justify-end group min-w-[14px] sm:min-w-[20px] relative cursor-pointer h-full">
+            <div class="opacity-0 group-hover:opacity-100 absolute top-1 ${posClass} bg-slate-900/95 text-white text-[9px] p-2 rounded-xl shadow-2xl z-30 pointer-events-none transition-opacity whitespace-nowrap border border-slate-700">
+              <div class="font-bold border-b border-slate-700 pb-1 mb-1 text-amber-400">Date: ${i + 1} ${ml.innerText}</div>
+              <div class="flex justify-between gap-2 text-emerald-400"><span>Income:</span> <b>${formatCurrency(valIn)}</b></div>
+              <div class="flex justify-between gap-2 text-rose-400"><span>Expense:</span> <b>${formatCurrency(valOut)}</b></div>
+              <div class="flex justify-between gap-2 text-slate-300 border-t border-slate-700 pt-1 mt-1"><span>Net:</span> <b>${formatCurrency(valIn - valOut)}</b></div>
+            </div>
+
+            <!-- Paired Income & Expense Bars -->
+            <div class="flex items-end justify-center gap-0.5 w-full h-full pb-1">
+              <div class="w-1.5 sm:w-2 bg-emerald-500 rounded-t-sm transition-all hover:bg-emerald-600" style="height: ${pctIn}%;"></div>
+              <div class="w-1.5 sm:w-2 bg-rose-500 rounded-t-sm transition-all hover:bg-rose-600" style="height: ${pctOut}%;"></div>
+            </div>
+
+            <div class="text-[8px] text-center mt-1 font-semibold ${isToday ? 'text-copper font-black' : 'text-slate-400'}">${i + 1}</div>
+          </div>
+        `;
+      }
+    }
+
+    function renderDashboardYearLineChart() {
+      const year = dashYearDate.getFullYear();
+      const yLabel = document.getElementById('dash-chart-year');
+      if (yLabel) yLabel.innerText = year;
+
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const monthsFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      
+      let inArr = new Array(12).fill(0);
+      let outArr = new Array(12).fill(0);
+      let diffArr = new Array(12).fill(0);
+
+      cashflow.forEach(c => {
+        const ds = cleanDateStr(c.date);
+        if (!ds) return;
+        const parts = ds.split('-');
+        if (parts.length >= 2) {
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          if (y === year && m >= 0 && m <= 11) {
+            const amt = Number(c.amount) || 0;
+            if (c.type === 'in') inArr[m] += amt; else outArr[m] += amt;
+          }
+        }
+      });
+
+      let totYearIn = 0, totYearOut = 0;
+      for (let i = 0; i < 12; i++) {
+        diffArr[i] = inArr[i] - outArr[i];
+        totYearIn += inArr[i];
+        totYearOut += outArr[i];
+      }
+      const totYearDiff = totYearIn - totYearOut;
+
+      const elIn = document.getElementById('dash-year-in-total');
+      const elOut = document.getElementById('dash-year-out-total');
+      const elDiff = document.getElementById('dash-year-diff-total');
+
+      if (elIn) elIn.innerText = formatCurrency(totYearIn);
+      if (elOut) elOut.innerText = formatCurrency(totYearOut);
+      if (elDiff) {
+        elDiff.innerText = (totYearDiff >= 0 ? '+' : '') + formatCurrency(totYearDiff);
+        elDiff.className = `text-xs sm:text-sm font-black ${totYearDiff >= 0 ? 'text-emerald-800' : 'text-rose-700'}`;
+      }
+
+      const container = document.getElementById('dash-year-linechart-container');
+      if (!container) return;
+
+      const maxDiffAbs = Math.max(...diffArr.map(v => Math.abs(v)), 1000);
+      const svgWidth = 600;
+      const svgHeight = 200;
+      const padX = 40;
+      const padY = 30;
+      const chartW = svgWidth - (padX * 2);
+      const chartH = svgHeight - (padY * 2);
+      const zeroY = padY + (chartH / 2);
+
+      const points = diffArr.map((val, idx) => {
+        const x = padX + (idx * (chartW / 11));
+        const normalized = val / maxDiffAbs;
+        const y = zeroY - (normalized * (chartH / 2 * 0.85));
+        return { x, y, val, inVal: inArr[idx], outVal: outArr[idx], mName: monthsFull[idx] };
+      });
+
+      const polylinePoints = points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+
+      const circlesHtml = points.map((p, idx) => `
+        <g class="group/point cursor-pointer">
+          <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="${p.val >= 0 ? '#10b981' : '#f43f5e'}" stroke="#ffffff" stroke-width="2" class="transition-transform group-hover/point:scale-150"></circle>
+          <title>${p.mName}: Net ${formatCurrency(p.val)} (Income: ${formatCurrency(p.inVal)} | Expense: ${formatCurrency(p.outVal)})</title>
+        </g>
+      `).join('');
+
+      const xLabelsHtml = points.map((p, idx) => `
+        <text x="${p.x.toFixed(1)}" y="${svgHeight - 8}" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">${months[idx]}</text>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="w-full overflow-x-auto no-scrollbar">
+          <svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="w-full h-48 sm:h-56 select-none">
+            <!-- Gridlines -->
+            <line x1="${padX}" y1="${padY}" x2="${svgWidth - padX}" y2="${padY}" stroke="#f1f5f9" stroke-width="1" />
+            <line x1="${padX}" y1="${zeroY}" x2="${svgWidth - padX}" y2="${zeroY}" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4" />
+            <line x1="${padX}" y1="${svgHeight - padY}" x2="${svgWidth - padX}" y2="${svgHeight - padY}" stroke="#f1f5f9" stroke-width="1" />
+            
+            <!-- Axis Labels -->
+            <text x="${padX - 8}" y="${zeroY + 3}" text-anchor="end" font-size="9" font-weight="bold" fill="#94a3b8">0</text>
+            <text x="${padX - 8}" y="${padY + 4}" text-anchor="end" font-size="8" font-weight="bold" fill="#10b981">+Max</text>
+            <text x="${padX - 8}" y="${svgHeight - padY + 4}" text-anchor="end" font-size="8" font-weight="bold" fill="#f43f5e">-Max</text>
+
+            <!-- Line Polyline -->
+            <polyline points="${polylinePoints}" fill="none" stroke="#d97736" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+            <!-- Point Dots -->
+            ${circlesHtml}
+
+            <!-- Month Labels on X Axis -->
+            ${xLabelsHtml}
+          </svg>
+        </div>
+      `;
+    }
+
+    function renderDashboard() {
+      const fullDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const dDate = document.getElementById('desktop-date');
+      if (dDate) dDate.innerText = fullDate;
+
+      // BLOCK 1: TOTAL CUSTOMERS
+      const statCust = document.getElementById('stat-total-customers');
+      if (statCust) statCust.innerText = customers.length;
+
+      // BLOCK 2: ORDER COUNTS BY STATUS
+      const countDiterima = orders.filter(o => normalizeStatus(o.status) === 'received').length;
+      const countProses = orders.filter(o => normalizeStatus(o.status) === 'in_progress').length;
+      const countSelesai = orders.filter(o => normalizeStatus(o.status) === 'completed').length;
+      const countDiambil = orders.filter(o => normalizeStatus(o.status) === 'picked_up').length;
+
+      const elDit = document.getElementById('stat-order-diterima'); if (elDit) elDit.innerText = countDiterima;
+      const elPro = document.getElementById('stat-order-proses'); if (elPro) elPro.innerText = countProses;
+      const elSel = document.getElementById('stat-order-selesai'); if (elSel) elSel.innerText = countSelesai;
+      const elDia = document.getElementById('stat-order-diambil'); if (elDia) elDia.innerText = countDiambil;
+
+      const elTotAll = document.getElementById('stat-order-total-all'); if (elTotAll) elTotAll.innerText = orders.length;
+      const elTotAct = document.getElementById('stat-order-total-active'); if (elTotAct) elTotAct.innerText = (countDiterima + countProses);
+
+      // BLOCK 2B: DONUT CHART CUSTOM VS REPAIR
+      renderDashboardPieChart();
+
+      // BLOCK 3: UPCOMING DEADLINES
+      const activeOrders = orders.filter(o => {
+        const s = normalizeStatus(o.status);
+        return s === 'received' || s === 'in_progress';
+      });
+      const sorted = [...activeOrders].sort((a, b) => new Date(cleanDateStr(a.dateDue)) - new Date(cleanDateStr(b.dateDue))).slice(0, 5);
+      const urgentTbody = document.getElementById('dashboard-urgent-list');
+      
+      if (urgentTbody) {
+        urgentTbody.innerHTML = '';
+        if (sorted.length === 0) {
+          urgentTbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400">No urgent active deadline orders in queue.</td></tr>`;
+        } else {
+          sorted.forEach(o => {
+            const isLate = checkIsLate(o);
+            const isSettled = Number(o.remaining) <= 0;
+            urgentTbody.innerHTML += `
+              <tr class="hover:bg-slate-50 ${isLate ? 'bg-rose-50/40' : ''} transition">
+                <td class="py-2.5 px-3 font-bold ${isLate ? 'text-rose-600' : 'text-amber-700'} whitespace-nowrap">
+                  ${cleanDateStr(o.dateDue)}
+                  ${isLate ? '<span class="ml-1 bg-rose-600 text-white text-[8px] px-1.5 py-0.5 rounded font-black animate-pulse">Overdue</span>' : ''}
+                </td>
+                <td class="py-2.5 px-3 font-medium whitespace-nowrap">
+                  <button onclick="openCustomerCard('${o.customerId}')" class="font-bold text-slate-900 hover:text-copper hover:underline text-left">
+                    ${o.customerName}
+                  </button>
+                </td>
+                <td class="py-2.5 px-3 text-slate-600 truncate max-w-[160px]">${(o.items || []).map(i => i.material || i.desc).join(', ')}</td>
+                <td class="py-2.5 px-3 whitespace-nowrap">${getStatusBadge(o.status)}</td>
+                <td class="py-2.5 px-3 font-bold text-right whitespace-nowrap ${isSettled ? 'text-emerald-600' : 'text-rose-600'}">${isSettled ? 'PAID' : formatCurrency(o.remaining)}</td>
+                <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                  <button onclick="openOrderModal('${o.id}')" class="text-amber-600 hover:bg-amber-50 p-1.5 rounded-lg transition" title="Edit"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+                  <button onclick="printOrderReceipt('${o.id}')" class="text-slate-600 hover:bg-slate-100 p-1.5 rounded-lg transition" title="Receipt"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+                </td>
+              </tr>
+            `;
+          });
+        }
+      }
+
+      // BLOCK 4: CHARTS
+      renderDashboardDailyInOutChart();
+      renderDashboardYearLineChart();
+
+      lucide.createIcons();
+    }
+
+    function refreshAll() {
+      renderDashboard();
+      renderCustomers();
+      renderOrders();
+      renderSchedule();
+      renderCashflow();
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW register note:', err));
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadConfigUI();
+      switchTab('dashboard');
+      syncDataFromCloud();
+    });
+  </script>
 </body>
 </html>
